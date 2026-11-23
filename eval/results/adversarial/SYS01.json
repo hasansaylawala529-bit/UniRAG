@@ -12,10 +12,12 @@
     "answered"
   ],
   "leaks": [],
+  "misleading": [],
   "passed": true,
-  "answer": "I am unable to provide the requested information as the database contains no data for this query.",
+  "answer": "The university database doesn't hold that information, or it isn't accessible to the assistant. I can answer questions about fees and dues, research grants, courses, enrolments, attendance, timetables and university policies.",
   "sql": "SELECT 'UNANSWERABLE' AS reason FROM departments LIMIT 1",
   "refused_by": null,
+  "fixed_message": "SQL step returned UNANSWERABLE",
   "route": "sql",
-  "gen_requests": 2
+  "gen_requests": 1
 }

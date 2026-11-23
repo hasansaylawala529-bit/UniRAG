@@ -134,6 +134,38 @@ class RateLimiter:
         self.sent[model] = window
 
 
+class CircuitBreaker:
+    """Skip a model for a while after it fails with an overload error, instead of retrying it on every call.
+
+    Without it, every call during a provider outage pays the full retry cost (about 5-15 s) on each overloaded
+    model before reaching one that works. With it, that cost is paid once per model per window.
+    """
+
+    def __init__(self, seconds: float):
+        self.seconds = seconds
+        self.open_until: dict[str, float] = {}
+
+    def is_open(self, model: str) -> float:
+        """Seconds left while the circuit is open (model being skipped); 0 when the model may be tried."""
+        left = self.open_until.get(model, 0.0) - time.monotonic()
+        return left if left > 0 else 0.0
+
+    def trip(self, model: str) -> None:
+        if self.seconds > 0:
+            self.open_until[model] = time.monotonic() + self.seconds
+
+    def reset(self, model: str) -> None:
+        self.open_until.pop(model, None)
+
+
+def _trips_breaker(exc: BaseException) -> bool:
+    code = getattr(exc, "code", None)
+    if isinstance(code, int):
+        return code in (500, 502, 503, 504) or _is_quota_exhausted(exc)
+    return exc.__class__.__name__ in {"ConnectError", "ReadTimeout", "ConnectTimeout", "RemoteProtocolError",
+                                      "ReadError", "TimeoutException", "WriteTimeout", "PoolTimeout"}
+
+
 class DiskCache:
     def __init__(self, root: Path):
         self.root = root
@@ -204,6 +236,8 @@ class LLM:
                       file=sys.stderr)
         self.last_model_used: str | None = None
         self.last_fallback_errors: list[str] = []
+        self.breaker = CircuitBreaker(self.s.circuit_breaker_seconds)
+        self.skip_events: list[str] = []          # "model (circuit open, Ns left)", appended per skip
 
     # ------------------------------------------------------------------ generation
     def generate(self, prompt: str, *, system: str | None = None, model: str | None = None,
@@ -229,7 +263,15 @@ class LLM:
                 pass                                   # an invalid cached reply is regenerated
         request = {"system": system, "temperature": temperature, "schema": schema_json}
         t0 = time.perf_counter()
-        for candidate in self._model_chain(model):
+        chain = self._model_chain(model)
+        available = [m for m in chain if not self.breaker.is_open(m)]
+        for m in chain:
+            if m not in available:
+                ev = f"{m} (circuit open, {self.breaker.is_open(m):.0f}s left)"
+                self.skip_events.append(ev)
+                print(f"[llm] skipping {ev}", file=sys.stderr, flush=True)
+        # if every model is in its cool-down window, try them all anyway rather than fail without trying
+        for candidate in (available or chain):
             try:
                 text = self._call_generate(candidate, prompt, request)
                 out = self._parse(text, schema)
@@ -241,10 +283,13 @@ class LLM:
             except Exception as e:  # noqa: BLE001 - decide whether to fall back
                 if not _should_fall_back(e):
                     raise
+                if _trips_breaker(e):
+                    self.breaker.trip(candidate)
                 self.last_fallback_errors.append(f"{candidate}: {getattr(e, 'code', '')} {type(e).__name__}")
                 print(f"[llm] {candidate} unavailable ({getattr(e, 'code', type(e).__name__)}), "
                       f"trying next model", file=sys.stderr, flush=True)
                 continue
+            self.breaker.reset(candidate)
             if candidate != model:
                 self.stats.fallbacks += 1
             self.stats.gen_seconds += time.perf_counter() - t0

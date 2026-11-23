@@ -63,7 +63,9 @@ and generation requests / latency per route.
 ## Security evaluation
 ```bash
 python eval/run_adversarial.py             # 24 adversarial / privacy cases -> eval/results/adversarial_summary.md
+python eval/run_adversarial.py --only PII04 SQLI02   # re-run selected cases; the report still covers all 24
 ```
+Besides leaks, each case can list false claims seen in earlier runs (`must_not_claim`); an answer that makes one fails.
 Access policy (anonymous / student / staff, read-only, no e-mails): [`docs/security_policy.md`](docs/security_policy.md).
 
 ## Ask questions (full pipeline)

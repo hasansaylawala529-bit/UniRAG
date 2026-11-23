@@ -270,6 +270,12 @@ with trace_col:
                 st.caption(trace["understand"]["sql_task"])
             if r.get("refused_by"):
                 st.warning(f"Refused by: {r['refused_by']} · role: {r.get('role')}")
+            fixed = trace.get("synthesize", {}).get("fixed_message")
+            if fixed:
+                st.info(f"Fixed message, no model call: {fixed}")
+            skipped = [s for e in r["trace"] for s in e.get("skipped_models", [])]
+            if skipped:
+                st.caption("Skipped (overloaded recently, circuit open): " + ", ".join(dict.fromkeys(skipped)))
             for n in r["notes"]:
                 st.warning(n)
 

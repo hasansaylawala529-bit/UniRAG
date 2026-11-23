@@ -21,10 +21,11 @@ This policy defines what each user may see and how every rule is enforced. It is
 | R2 | Anonymous users get aggregates only | SQL guard: a query on a personal table must return only aggregates or non-identifying attributes (department, year, status); `SELECT *`, names, ids, CGPA, balances or attendance per row are refused, as is filtering on one student's id | refusal is not sent back for "repair" |
 | R3 | Students see only their own rows | (a) privacy rule refuses questions that name another student's id; (b) SQL guard rewrites every personal table into a subquery filtered to the logged-in student, whatever WHERE clause the model wrote; (c) a query filtering on another student's id is refused | 0 model calls for (a) |
 | R4 | Personal questions need an identity | "my fees / my CGPA …" without a logged-in student → asked to log in, before any model call | 0 model calls |
-| R5 | No e-mail addresses | SQL guard refuses any query that references the `email` column, for every role | — |
+| R5 | No student contact data | (a) contact-data rule refuses requests for students' e-mail addresses or phone numbers ("list all students' emails", "Riya Shah's email") before any model call, while office contacts and procedures ("who should I e-mail about refunds?") stay allowed; (b) SQL guard refuses any query that references the `email` column, for every role | 0 model calls for (a) |
 | R6 | No system or internal tables | SQL guard allow-lists the 9 application tables; `information_schema`, `pg_catalog`, other schemas and the vector tables are refused | — |
 | R7 | Off-topic and jailbreak requests are declined | semantic router / LLM planner → out-of-scope node with a fixed reply (no generation) | 0–1 model calls |
 | R8 | Answers never present unverifiable figures as fact | verifier checks every number and date against the evidence and database totals | — |
+| R9 | "Nothing found" is never improvised | when a database-only question has no usable rows, the answer is a fixed message chosen in code: data not held (UNANSWERABLE), not accessible (guard rejected every query), none in your own records, other students' records need staff access (scoped to 0 rows), or no matching records plus what was checked | 0 synthesis calls |
 
 Personal tables: `students`, `enrollments`, `fee_ledger`, `grant_applications`.
 Identifying columns: `student_id`, `full_name`, `email`, `cgpa`, `gpa_4`, `amount_due`, `amount_paid`, `paid_on`,

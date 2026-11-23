@@ -37,6 +37,18 @@ SELF_PROCEDURE_RE = re.compile(r"^\s*(how\s+(do|can|should)\s+i|can\s+i|may\s+i|
                                r"\s+(for\s+me\s+)?to|when\s+can\s+i)\b", re.I)
 # "my attendance is 70 percent" states the value: a hypothetical policy question, not a record lookup
 STATED_VALUE_RE = re.compile(r"\b(my|mine)\s+(\w+\s+){0,2}(is|was|are|of|=|at)\s+\d", re.I)
+# students' contact data (never returned, for any role). The contact term must be used as a noun: "who should I
+# email about refunds" or "e-mail the accounts office" are procedural questions, not requests for addresses.
+CONTACT_TERM_RE = re.compile(
+    r"\b(e-?mail\s+(address(es)?|ids?)|e-?mails(?!\s+(about|on|regarding|for|when))|mail\s+ids?|phone(\s+numbers?)?|mobile(\s+numbers?)?"
+    r"|contact\s+(details|numbers?|info(rmation)?)|addresses)\b"
+    r"|\be-?mail\b(?!\s+(the|a|an|about|to|for|me|us|him|her|them|it|this|your|my|when|if|regarding)\b)", re.I)
+# "do students get / receive e-mails ..." asks how the university communicates, not for addresses
+CONTACT_DELIVERY_RE = re.compile(r"\b(get|gets|getting|receive|receives|received|send(?!\s+(me|us)\b)|sends|sent|notif\w*)\b", re.I)
+CONTACT_SUBJECT_RE = re.compile(r"\b(students?|classmates?|batchmates?|everyone|everybody|users?|people)\b"
+                                r"|\b[A-Z][a-z]+(\s+[A-Z][a-z]+)?'s\s+(e-?mail|phone|mobile|contact)", re.I)
+OFFICE_RE = re.compile(r"\b(office|cell|department|dept|desk|committee|registrar|warden|helpdesk|help\s+desk|"
+                       r"coordinator|section)\b", re.I)
 DATE_IN_TEXT_RE = re.compile(r"\b(?:as of|on|by)\s+(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}|\d{4}-\d{2}-\d{2})", re.I)
 
 
@@ -77,6 +89,23 @@ class QuestionEntities:
     first_person: bool = False
     personal_records: bool = False
     write_intent: bool = False
+    contact_request: bool = False
+
+
+def is_contact_request(question: str) -> bool:
+    """True for a request for students' e-mail addresses / phone numbers (refused before any model call)."""
+    q = question.strip()
+    if not CONTACT_TERM_RE.search(q) or SELF_PROCEDURE_RE.search(q) or CONTACT_DELIVERY_RE.search(q):
+        return False
+    subject = CONTACT_SUBJECT_RE.search(q)
+    if not subject and not STUDENT_ID_RE.search(q):
+        return False
+    # "the Accounts Office's e-mail" names an office, not a person
+    only_possessive = subject is not None and not re.search(r"\b(students?|classmates?|batchmates?|everyone|everybody|"
+                                                           r"users?|people)\b", q, re.I)
+    if only_possessive and OFFICE_RE.search(q) and not STUDENT_ID_RE.search(q):
+        return False
+    return True
 
 
 def extract_entities(question: str) -> QuestionEntities:
@@ -118,6 +147,7 @@ def extract_entities(question: str) -> QuestionEntities:
     e.first_person = bool(FIRST_PERSON_RE.search(q))
     e.personal_records = bool(PERSONAL_RECORD_RE.search(q)) and not STATED_VALUE_RE.search(q)
     e.write_intent = bool(WRITE_INTENT_RE.search(q)) and not SELF_PROCEDURE_RE.search(q)
+    e.contact_request = is_contact_request(q)
     return e
 
 

@@ -242,4 +242,6 @@ Order of what to cut if behind schedule: MCP → HyDE → verifier regeneration 
 
 **Second provider (P-017):** when every Gemini model in a chain fails, generation falls back to Groq (`gpt-oss-120b`, then `gpt-oss-20b`) with strict JSON-schema output, validated against the same pydantic models. Embeddings stay on Gemini.
 
+**Circuit breaker (P-020):** a model that fails with an overload error (500/502/503/504, quota exhausted, or a network timeout) is skipped by every following call for 60 s (`CIRCUIT_BREAKER_SECONDS`), so the retry cost of an outage is paid once per minute instead of on every call. Skipped models appear in the trace (`skipped_models`), the UI and the `[llm]` log. If every model in the chain is in its cool-down window, all are tried anyway; a success closes the circuit.
+
 All model IDs and limits live in `.env` (`GEN_MODEL`, `FAST_MODEL`, `*_FALLBACKS`, `MODEL_RPM`). Moving to a paid tier needs no code change.

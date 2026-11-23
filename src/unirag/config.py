@@ -51,6 +51,8 @@ class Settings:
     model_rpm: dict[str, int] = field(default_factory=lambda: _rpm_map(os.getenv("MODEL_RPM", ""), RPM_DEFAULTS))
     # tokens per minute (estimated from prompt length); needed for Groq's 8K TPM free tier
     model_tpm: dict[str, int] = field(default_factory=lambda: _rpm_map(os.getenv("MODEL_TPM", ""), TPM_DEFAULTS))
+    # A model that fails with an overload error (503/504/5xx, network) is skipped for this many seconds
+    circuit_breaker_seconds: float = field(default_factory=lambda: float(os.getenv("CIRCUIT_BREAKER_SECONDS", "60")))
     # Second provider: used only after every Gemini model in a chain has failed. Empty key = disabled.
     groq_api_key: str = field(default_factory=lambda: os.getenv("GROQ_API_KEY", ""))
     groq_fallback_models: tuple[str, ...] = field(default_factory=lambda: _csv(

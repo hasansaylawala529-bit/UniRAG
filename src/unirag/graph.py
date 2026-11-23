@@ -48,6 +48,21 @@ STAFF_ONLY_MESSAGE = ("Records of an individual student need a logged-in student
                       "averages.")
 LOGIN_MESSAGE = ("This question is about your own records (fees, attendance, enrolment). Please choose your "
                  "student ID under \"Logged in as\" so I can show only your data.")
+CONTACT_MESSAGE = ("Students' contact details (e-mail addresses and phone numbers) are never shared by the "
+                   "assistant, whatever the role. To reach a student, please go through the Academic Office.")
+# fixed answers for database outcomes, so the model never improvises a claim about what the data contains
+UNANSWERABLE_MESSAGE = ("The university database doesn't hold that information, or it isn't accessible to the "
+                        "assistant. I can answer questions about fees and dues, research grants, courses, "
+                        "enrolments, attendance, timetables and university policies.")
+NOT_ACCESSIBLE_MESSAGE = ("That data isn't accessible to the assistant: it can read only the university's fee, "
+                          "grant, course, enrolment, attendance and timetable records, never system tables, "
+                          "credentials or contact details.")
+DB_FAILED_MESSAGE = ("I couldn't get an answer from the university database for this question, so I won't guess. "
+                     "Please try rephrasing it, or ask again in a moment.")
+OWN_NO_ROWS_MESSAGE = ("No matching records were found in your own records. As a student you can see only your "
+                       "own data; questions about other students' records need staff access.")
+OWN_NONE_MESSAGE = "Nothing matched in your records for this question."
+NO_ROWS_MESSAGE = "The database query ran but found no matching records."
 DECLINE_MESSAGE = ("I can only help with DVUT questions about courses and timetables, fees and refunds, research "
                    "grants and scholarships, exams and attendance, hostel rules and course registration. "
                    "Could you rephrase your question around one of these?")
@@ -85,12 +100,16 @@ def traced(name: str) -> Callable:
         def wrapper(state: State) -> dict:
             llm = get_llm()
             g0, h0, r0 = llm.stats.gen_calls, llm.stats.cache_hits, llm.stats.gen_requests
+            k0 = len(getattr(llm, "skip_events", []))
             t0 = time.perf_counter()
             updates, info = fn(state)
             event = {"node": name, "ms": int((time.perf_counter() - t0) * 1000),
                      "gen_requests": llm.stats.gen_requests - r0,
                      "llm_calls": llm.stats.gen_calls - g0,
                      "cache_hits": llm.stats.cache_hits - h0, **info}
+            skipped = getattr(llm, "skip_events", [])[k0:]
+            if skipped:
+                event["skipped_models"] = skipped
             if event["gen_requests"] or info.get("prompt"):
                 event.setdefault("model", getattr(llm, "last_model_used", None))
             updates["trace"] = [event]
@@ -110,6 +129,8 @@ def node_profile(state: State) -> tuple[dict, dict]:
     refusal = None
     if ents.write_intent:
         refusal = (WRITE_MESSAGE, "write-intent rule")
+    elif ents.contact_request:
+        refusal = (CONTACT_MESSAGE, "privacy rule (contact data)")
     elif role == "student" and ents.student_id and ents.student_id != state.get("student_id"):
         refusal = (OWN_RECORDS_MESSAGE, "privacy rule (other student)")
     elif role == "anonymous" and ents.student_id:
@@ -222,8 +243,8 @@ def node_query(state: State) -> tuple[dict, dict]:
     notes = [] if r.ok else [f"The database step failed ({r.error}); the answer uses policy documents only."]
     if r.privacy_block:
         msg = {"anonymous": STAFF_ONLY_MESSAGE, "student": OWN_RECORDS_MESSAGE}.get(role, r.privacy_block)
-        if "Email" in r.privacy_block:
-            msg = "Email addresses are not shared by the assistant. Please contact the Academic Office."
+        if "mail" in r.privacy_block.lower():
+            msg = CONTACT_MESSAGE
         return ({"sql": None, "refusal": msg, "refused_by": "SQL guard (access policy)"},
                 {"mode": mode, "executed_at": executed_at, "blocked": r.privacy_block, "role": role})
     return ({"sql": r, "notes": notes},
@@ -234,11 +255,45 @@ def node_query(state: State) -> tuple[dict, dict]:
              "mode": mode, "executed_at": executed_at, "role": role})
 
 
+def fixed_database_message(state: State) -> tuple[str, str] | None:
+    """A deterministic answer when a database-only question has no usable rows, else None.
+
+    The model is not asked to phrase "nothing found": in the security run it turned an UNANSWERABLE result into
+    "there are no open grants" (false) and "the database contains no records for e-mail addresses" (misleading).
+    Hybrid questions keep the model, because the policy passages can still answer part of them.
+    """
+    r = state.get("sql")
+    if state.get("route") != "sql" or r is None:
+        return None
+    attempts = getattr(r, "attempts", []) or []
+    if not r.ok:
+        guard_blocked = any((a.error or "").startswith("GuardError") for a in attempts)
+        return ((NOT_ACCESSIBLE_MESSAGE, "guard rejected every query") if guard_blocked
+                else (DB_FAILED_MESSAGE, "database step failed"))
+    if r.unanswerable:
+        return UNANSWERABLE_MESSAGE, "SQL step returned UNANSWERABLE"
+    if not r.rows:
+        notes = attempts[-1].guard_notes if attempts else []
+        what = (r.explanation or "").strip().rstrip(".")
+        checked = f" What was checked: {what}." if what else ""
+        if state.get("role") == "student" and any(n.startswith("Scoped") for n in notes):
+            ents = state.get("entities")
+            if ents is not None and ents.first_person:           # "what are my overdue fees?" -> none
+                return OWN_NONE_MESSAGE + checked, "0 rows in the student's own records"
+            return OWN_NO_ROWS_MESSAGE, "0 rows after scoping to the logged-in student"
+        return NO_ROWS_MESSAGE + checked, "query returned 0 rows"
+    return None
+
+
 @traced("synthesize")
 def node_synthesize(state: State) -> tuple[dict, dict]:
     if state.get("refusal"):
         return ({"answer": state["refusal"], "citations": [], "relevant_hits": []},
                 {"refused_by": state.get("refused_by")})
+    fixed = fixed_database_message(state)
+    if fixed:
+        return ({"answer": fixed[0], "citations": [], "relevant_hits": []},
+                {"fixed_message": fixed[1], "llm": "none (fixed message)"})
     r = state.get("sql")
     hits = state.get("relevant_hits") or ([] if state.get("route") == "sql" else state.get("hits", [])[:4])
     ev = state.get("rule_eval")
