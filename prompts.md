@@ -473,6 +473,31 @@ Latency median / p90: SQL 26.5 / 97.6 s · Documents 18.1 / 59.1 s · Hybrid 72.
   4. `run_eval.py --fresh` keeps the first run's (fully live) latency, because a re-run reuses cached planner/SQL calls and would otherwise report flattering latency.
 - **Review:** 63 tests pass; offline graph run is unchanged except for the corrected attendance route. Re-run the evaluation next.
 
+### P-015 · Final evaluation run
+- **Date/time:** 2026-11-23, 18:12 IST
+- **Prompt:** I shared the output of `python eval/run_eval.py --fresh` and asked for the next steps.
+- **Result (36 questions, expected answers computed from the database and policy rules):**
+
+  | Metric | First run (P-014) | Final |
+  |---|---|---|
+  | Routing accuracy | 35/36 (97%) | **35/36 (97%)** |
+  | Key facts: SQL | 16/22 (73%) | **22/22 (100%)** |
+  | Key facts: Documents | 11/11 (100%) | **11/11 (100%)** |
+  | Key facts: Hybrid | 54/59 (92%), 8/12 fully correct | **53/59 (90%), 9/12 fully correct** |
+  | Key facts: all | 81/92 (88%), 31/36 | **86/92 (93%), 33/36** |
+  | Out of scope declined | 4/4 | **4/4** |
+  | Vector-only RAG baseline on hybrid | 14/59 (24%), 1/12 | 14/59 (24%), 1/12 |
+  | LLM SQL success (first attempt) | 19/19 | 19/19 (+3 compiled in code) |
+
+- **Interpretation:**
+  - SQL06 (query context) and H3 (wrong total) are fixed.
+  - The remaining gaps are omissions, not wrong statements: H1 leaves out amounts/deadlines of upcoming grants, H2 leaves out the ₹500 condonation fee, and H4 leaves out the 28-credit limit. The hybrid key-fact score dipped from 92% to 90% only because H1 omitted two more amounts this run (LLM variation), while more hybrid questions are now fully correct (9 vs 8).
+  - Latency (kept from the fully live first run) is dominated by Google free-tier 503 retries.
+- **Three most important remaining weaknesses:**
+  1. **Completeness on long multi-item answers.** Flash-Lite sometimes drops items from long lists (H1). A larger generation model or a structured "every row must appear" check would close this.
+  2. **Latency on the free tier:** median 18–73 s, mostly transient 503 retries. Planned mitigations: a cross-provider fallback (Groq) and a paid tier in production.
+  3. **The verifier proves provenance, not reasoning.** Figures are checked against the evidence and totals against the database, but a wrong conclusion built from correct figures can still pass. That is why answers show their working and every claim is cited.
+
 ## Phase 6 – Demo, presentation & delivery
 
 ---
