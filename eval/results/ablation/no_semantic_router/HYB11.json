@@ -1,0 +1,22 @@
+{
+  "id": "HYB11",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**Below‑attendance course:** CS301 – Database Management Systems (attendance 66.9 %) [SQL].\n\n- The minimum required attendance is **75 %** per course [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance].\n- CS301’s attendance (66.9 %) is **below 75 %** but **≥ 65 %**, so it falls in the **condonable range** [Doc: Examination & Attendance Rules 2026-27 §3 Condonation of attendance].\n\n**Condonation eligibility**\n\n| Course | Attendance | Condonation possible? | Conditions |\n|--------|------------|-----------------------|------------|\n| CS301 – Database Management Systems | 66.9 % [SQL] | Yes | • Submit a condonation application with supporting documents (e.g., medical certificate) to the Head of Department.<br>• Pay the condonation fee of **₹500** per course.<br>• Request must be made **before the last teaching day of the term**.<br>• You may receive condonation for up to **two courses** in this term. [Doc: Examination & Attendance Rules 2026-27 §3 Condonation of attendance] |\n\nAll other registered courses meet or exceed the 75 % threshold, so no further action is needed for them.",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT c.course_code, c.title, e.attendance_pct FROM (SELECT * FROM enrollments WHERE student_id = 'S2024CS006') AS e JOIN courses AS c ON e.course_id = c.course_id WHERE e.student_id = 'S2024CS006' AND e.status = 'enrolled' ORDER BY c.course_code LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 28808,
+  "wall_s": 28.81
+}

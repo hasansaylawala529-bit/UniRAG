@@ -242,6 +242,12 @@ Order of what to cut if behind schedule: MCP → HyDE → verifier regeneration 
 
 **Second provider (P-017):** when every Gemini model in a chain fails, generation falls back to Groq (`gpt-oss-120b`, then `gpt-oss-20b`) with strict JSON-schema output, validated against the same pydantic models. Embeddings stay on Gemini.
 
+**Ablation switches (P-021):** `src/unirag/features.py` can switch off the semantic router, the rule engine, relevance grading or schema-card retrieval, one at a time (`UNIRAG_ABLATE` or `ablate(...)`). `eval/run_ablation.py` measures what each component contributes.
+
+**MCP server (P-022):** `python -m unirag.mcp_server` exposes three read-only tools (`ask`, `search_policies`, `describe_data`) over stdio. The identity is fixed in the server's configuration, so every MCP call goes through the same policy layers as the UI.
+
+**Multi-turn follow-ups (P-023):** `src/unirag/conversation.py` detects follow-ups without a model call (opener, short question without a topic, or a reference without a topic) and rewrites them with one fast-model call (`conversation_rewrite.v1`). The pipeline then runs unchanged on the standalone question. Policy rules run on both the typed and the rewritten question, and a conversation is bound to one identity.
+
 **Circuit breaker (P-020):** a model that fails with an overload error (500/502/503/504, quota exhausted, or a network timeout) is skipped by every following call for 60 s (`CIRCUIT_BREAKER_SECONDS`), so the retry cost of an outage is paid once per minute instead of on every call. Skipped models appear in the trace (`skipped_models`), the UI and the `[llm]` log. If every model in the chain is in its cool-down window, all are tried anyway; a success closes the circuit.
 
 All model IDs and limits live in `.env` (`GEN_MODEL`, `FAST_MODEL`, `*_FALLBACKS`, `MODEL_RPM`). Moving to a paid tier needs no code change.

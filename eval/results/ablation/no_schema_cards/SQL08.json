@@ -1,0 +1,22 @@
+{
+  "id": "SQL08",
+  "variant": "no_schema_cards",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "There are 2 free seats still available in the CS3E1 Machine Learning elective [SQL]. \n\nHere are the details for the CS3E1 Machine Learning elective:\n\n| Course Code | Title | Capacity | Seats Taken | Free Seats |\n|---|---|---|---|---|\n| CS3E1 | Machine Learning [SQL] | 15 [SQL] | 13 [SQL] | 2 [SQL] |",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT t1.course_code, t1.title, t1.capacity, COUNT(t2.enrollment_id) AS seats_taken, (t1.capacity - COUNT(t2.enrollment_id)) AS free_seats FROM courses AS t1 LEFT JOIN enrollments AS t2 ON t1.course_id = t2.course_id AND t2.status = 'enrolled' WHERE t1.course_code = 'CS3E1' GROUP BY t1.course_code, t1.title, t1.capacity LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 11722,
+  "wall_s": 11.72
+}

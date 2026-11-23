@@ -1,0 +1,22 @@
+{
+  "id": "HYB08",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "Based on your profile (Year 2 IT student, CGPA 7.75), you are currently eligible to apply for two open grants. Please note that you may hold at most two research grants at the same time [Doc: Research Grant Policy 2026-27 §2].\n\n### Open Grants\nYou may apply for the following grants, as your CGPA 7.75 meets the minimum requirements for both [Doc: Research Grant Policy 2026-27 §3]:\n\n| Grant Code | Title | Amount | Deadline |\n| :--- | :--- | :--- | :--- |\n| GR-DS-05 | Data Science for Governance Fellowship | ₹50,000 | 31 Dec 2026 |\n| GR-OS-11 | Open Source Contribution Grant | ₹25,000 | 31 Dec 2026 |\n\n*   **GR-DS-05:** Requires a statement of purpose and your latest grade card [Doc: Research Grant Policy 2026-27 §3].\n*   **GR-OS-11:** Requires links to at least two merged pull requests and mentor contact details [Doc: Research Grant Policy 2026-27 §3].\n\n### Closed Grants\nThe following grant is currently closed and is no longer accepting applications:\n*   **GR-HW-06 (Hardware Hackathon Seed Fund):** Status is closed [SQL].\n\n**Note:** You are not eligible for **GR-SUS-08** (requires CGPA 8.0) or **GR-SP-14** (requires CGPA 9.0) [Doc: Research Grant Policy 2026-27 §3]. Applications are only accepted while the status is open [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 5,
+  "facts_total": 5,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "compiled_from_rules",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-OS-11', 'GR-DS-05', 'GR-HW-06']) ORDER BY application_deadline",
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 91871,
+  "wall_s": 91.87
+}

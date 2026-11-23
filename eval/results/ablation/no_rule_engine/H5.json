@@ -1,0 +1,22 @@
+{
+  "id": "H5",
+  "variant": "no_rule_engine",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "Yes, student Riya Shah (S2025CS017) is eligible for a merit fee concession of ₹21,750 [SQL]. \n\n### Eligibility and Concession Details:\n* **CGPA:** 8.6, which falls into the 8.50 – 8.99 slab (15% of annual tuition) [Doc: Scholarship & Fee Concession Policy 2026-27 §2].\n* **Overdue Dues:** 0 overdue entries in the fee ledger, satisfying the no-overdue-dues condition [SQL] [Doc: Scholarship & Fee Concession Policy 2026-27 §3].\n* **Calculation:** 15% × ₹1,45,000 (annual tuition) = ₹21,750 [SQL] [Doc: Scholarship & Fee Concession Policy 2026-27 §4].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.student_id, s.full_name, s.cgpa, fs.amount AS annual_tuition, fs.amount * 0.15 AS concession_amount, (SELECT COUNT(*) FROM fee_ledger AS fl WHERE fl.student_id = s.student_id AND fl.status = 'overdue') AS overdue_count FROM students AS s JOIN departments AS d ON s.dept_id = d.dept_id JOIN fee_structure AS fs ON fs.dept_id = d.dept_id AND fs.year_of_study = s.year_of_study AND fs.component = 'tuition' AND fs.academic_year = '2026-27' WHERE s.student_id = 'S2025CS017' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 12459,
+  "wall_s": 12.46
+}

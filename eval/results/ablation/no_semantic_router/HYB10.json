@@ -1,0 +1,22 @@
+{
+  "id": "HYB10",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "Based on the provided evidence, the exact amount of your tuition refund cannot be determined because the database does not contain the necessary information regarding when classes began relative to today's date (23 Nov 2026). \n\nHowever, according to the Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal, refunds are calculated on the tuition fee actually paid based on the timing of your written withdrawal request:\n\n* **Before classes begin:** 90% of tuition paid, less a processing fee of ₹1,000 [Doc: Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal]\n* **Within 14 days after classes begin:** 75% of tuition paid [Doc: Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal]\n* **15–30 days after classes begin:** 50% of tuition paid [Doc: Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal]\n* **More than 30 days after classes begin:** No refund [Doc: Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal]\n\nAdditionally, examination and laboratory fees are non-refundable once the term has started, hostel fee refunds follow the Hostel Rules, and refunds are paid to the original payment account within 30 working days [Doc: Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal].",
+  "facts_found": 0,
+  "facts_total": 0,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT 'UNANSWERABLE' AS reason FROM departments LIMIT 1",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 86907,
+  "wall_s": 86.91
+}

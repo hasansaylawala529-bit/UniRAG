@@ -1,0 +1,22 @@
+{
+  "id": "SQL02",
+  "variant": "full",
+  "expected_route": "sql",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "There are four research grants currently open with deadlines in January 2027 [SQL]. Applications must be submitted before the specified deadline, as late applications are not considered [Doc: Research Grant Policy 2026-27 §2].\n\nThe following grants are available:\n\n| Grant Code | Title | Application Deadline |\n| :--- | :--- | :--- |\n| GR-ML-02 | Undergraduate Machine Learning Research Assistantship | 10 Jan 2027 |\n| GR-IOT-07 | Smart Campus IoT Research Grant | 20 Jan 2027 |\n| GR-CY-03 | Cybersecurity Research Scholarship | 31 Jan 2027 |\n| GR-5G-15 | 5G and Next-Gen Networks Fellowship | 31 Jan 2027 |\n\nPlease note that applications are only accepted while the grant's status in the Register is open [Doc: Research Grant Policy 2026-27 §2]. Eligibility is assessed based on your CGPA, and first-year students are not eligible for any grants [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 7,
+  "facts_total": 7,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, application_deadline FROM grants WHERE status = 'open' AND application_deadline >= '2027-01-01' AND application_deadline <= '2027-01-31' ORDER BY application_deadline LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 426,
+  "wall_s": 0.43
+}

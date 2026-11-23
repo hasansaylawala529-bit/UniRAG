@@ -1,0 +1,22 @@
+{
+  "id": "SQL09",
+  "variant": "no_semantic_router",
+  "expected_route": "sql",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "Hello Siddharth Ranade (S2026CS012), you currently have two overdue fee items. Please find the details of your outstanding balances and applicable late fines below:\n\n| Component | Outstanding Balance | Late Fine | Due Date |\n| :--- | :--- | :--- | :--- |\n| tuition_inst1 | ₹45,000 | ₹5,000 | 14 Aug 2026 |\n| exam | ₹3,500 | ₹500 | 31 Oct 2026 |\n\n**Supporting Details:**\n*   **Late Fines:** Per policy, tuition instalments incur a daily fine of ₹100 capped at ₹5,000 per component [Doc: Fee Payment & Refund Policy 2026-27 §4]. Your tuition fine has reached this cap [SQL]. The examination fee incurs a flat fine of ₹500 [Doc: Fee Payment & Refund Policy 2026-27 §4].\n*   **Total Outstanding:** The total outstanding balance is ₹45,000 + ₹3,500 = ₹48,500 [SQL].\n*   **Payment:** These items are marked as overdue because a balance remains after the due date [Doc: Fee Payment & Refund Policy 2026-27 §3]. You may pay these online through the student portal [Doc: Fee Payment & Refund Policy 2026-27 §3].\n*   **Waivers:** The Accounts Office may waive late fines only for documented medical emergencies or bereavement, provided an application is submitted within 30 days [Doc: Fee Payment & Refund Policy 2026-27 §4].",
+  "facts_found": 2,
+  "facts_total": 2,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT component, amount_due, amount_paid, (amount_due - amount_paid) AS outstanding_balance, due_date, CASE WHEN component = 'exam' THEN 500 ELSE LEAST((CAST('2026-11-23' AS DATE) - due_date) * 100, 5000) END AS late_fine FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2026CS012') AS fee_ledger WHERE student_id = 'S2026CS012' AND status = 'overdue' ORDER BY due_date ASC LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 102351,
+  "wall_s": 102.35
+}

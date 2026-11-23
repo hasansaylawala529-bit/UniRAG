@@ -1,0 +1,22 @@
+{
+  "id": "HYB12",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "You are eligible for a merit concession of **₹36,250** on next year's tuition (25% of your annual tuition) [Doc: Scholarship & Fee Concession Policy 2026-27 §2 Merit concession slabs].\n\n### Working and Eligibility Details:\n* **CGPA:** 9.01 ≥ 9.00 (qualifies for the 25% slab) [Doc: Scholarship & Fee Concession Policy 2026-27 §2 Merit concession slabs; Profile used].\n* **Fee ledger:** has_overdue_dues is False (meets the eligibility condition of having no overdue entries) [Doc: Scholarship & Fee Concession Policy 2026-27 §3 Eligibility conditions; Profile used].\n* **Calculation:** 25% × ₹1,45,000 [SQL] = **₹36,250** [Doc: Scholarship & Fee Concession Policy 2026-27 §4 Calculation and application].\n\nThis concession will be credited against next year's tuition and split proportionally across the two instalments [Doc: Scholarship & Fee Concession Policy 2026-27 §4 Calculation and application].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT fs.component, fs.amount FROM fee_structure AS fs JOIN departments AS d ON fs.dept_id = d.dept_id WHERE d.code = 'CS' AND fs.year_of_study = 3 AND fs.component = 'tuition' AND fs.academic_year = '2026-27' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 72374,
+  "wall_s": 72.37
+}

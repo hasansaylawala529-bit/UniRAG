@@ -1,0 +1,24 @@
+{
+  "id": "CONV03",
+  "identity": "anonymous",
+  "turns": [
+    "What is the annual tuition for a third-year CS student?",
+    "And for a third-year ENTC student?"
+  ],
+  "first_answer": "The annual tuition for a third-year CS student is ₹1,45,000 [SQL].",
+  "detected": true,
+  "detected_by": "opener",
+  "asked": "What is the annual tuition for a third-year ENTC student?",
+  "rewrite_ok": true,
+  "answer": "The annual tuition fee for a third-year ENTC student is ₹1,30,000 [SQL].\n\nThis amount is determined based on the current fee structure for the ENTC department and the student's year of study [Doc: Fee Payment & Refund Policy 2026-27 §1 Scope].",
+  "route": "sql",
+  "refused_by": null,
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "leaks": [],
+  "policy_ok": true,
+  "passed": true,
+  "gen_requests_turn2": 4
+}

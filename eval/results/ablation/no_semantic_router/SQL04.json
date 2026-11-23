@@ -1,0 +1,24 @@
+{
+  "id": "SQL04",
+  "variant": "no_semantic_router",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "Records of an individual student need a logged-in student (their own records) or staff access. Without logging in I can share policies and overall figures such as counts and averages.",
+  "facts_found": 0,
+  "facts_total": 1,
+  "missing": [
+    "21"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 76349,
+  "wall_s": 76.35
+}

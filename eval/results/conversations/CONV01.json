@@ -1,0 +1,24 @@
+{
+  "id": "CONV01",
+  "identity": "staff",
+  "turns": [
+    "How many students are enrolled in Computer Science?",
+    "And in Information Technology?"
+  ],
+  "first_answer": "There are 72 students enrolled in the Computer Science department [SQL]. \n\n* **Total enrolled students:** 72 [SQL]",
+  "detected": true,
+  "detected_by": "opener",
+  "asked": "How many students are enrolled in Information Technology?",
+  "rewrite_ok": true,
+  "answer": "There are 64 students enrolled in the Information Technology department [SQL].",
+  "route": "sql",
+  "refused_by": null,
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "leaks": [],
+  "policy_ok": true,
+  "passed": true,
+  "gen_requests_turn2": 3
+}

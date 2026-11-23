@@ -1,0 +1,22 @@
+{
+  "id": "HYB10",
+  "variant": "no_schema_cards",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "If you withdraw from the university today, you will receive **no refund** on your tuition [Doc: Fee Payment & Refund Policy 2026-27 §6]. \n\n### Supporting Details\n* **Total Tuition Paid:** ₹3,21,90,000 [SQL]\n* **Class Start Time:** 2026-10-26T15:00:00 [SQL]\n* **Reference Date:** 23 Nov 2026 (Today)\n* **Days Elapsed:** More than 30 days have elapsed since classes began. According to the refund policy, withdrawal requests received \"More than 30 days after classes begin\" are eligible for **No refund** [Doc: Fee Payment & Refund Policy 2026-27 §6].",
+  "facts_found": 0,
+  "facts_total": 0,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": false,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT SUM(f.amount_paid) AS total_tuition_paid, MIN(t.start_time) AS class_start_time, CAST('2026-10-27' AS DATE) - MIN(t.start_time) AS days_elapsed FROM fee_ledger AS f JOIN students AS s ON f.student_id = s.student_id CROSS JOIN timetable AS t WHERE s.student_id = 'S2025CS001' AND f.component LIKE 'tuition_%' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 3512,
+  "wall_s": 3.51
+}

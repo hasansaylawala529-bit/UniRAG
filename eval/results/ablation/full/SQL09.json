@@ -1,0 +1,22 @@
+{
+  "id": "SQL09",
+  "variant": "full",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "Hello Siddharth Ranade (S2026CS012), you currently have two overdue fee items.\n\nThe following table details your outstanding balances:\n\n| Component | Outstanding Balance | Due Date |\n| :--- | :--- | :--- |\n| tuition_inst1 | ₹45,000 [SQL] | 14 Aug 2026 [SQL] |\n| exam | ₹3,500 [SQL] | 31 Oct 2026 [SQL] |\n\nThe total outstanding amount is ₹45,000 + ₹3,500 = ₹48,500.",
+  "facts_found": 2,
+  "facts_total": 2,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT component, amount_due, amount_paid, (amount_due - amount_paid) AS outstanding_balance, due_date FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2026CS012') AS fee_ledger WHERE student_id = 'S2026CS012' AND status = 'overdue' ORDER BY due_date ASC LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 361,
+  "wall_s": 0.36
+}

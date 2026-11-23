@@ -1,0 +1,22 @@
+{
+  "id": "SQL06",
+  "variant": "no_schema_cards",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "Prof. A. Phadke is teaching the following courses this term:\n\n* CS204 – Object Oriented Programming [SQL]\n* CS304 – Software Engineering [SQL]\n* CS305 – DBMS Lab [SQL]\n* IT102 – Engineering Physics [SQL]\n* IT205 – DSA Lab [SQL]\n* IT4E1 – Deep Learning [SQL]",
+  "facts_found": 6,
+  "facts_total": 6,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT course_code, title FROM courses WHERE instructor = 'Prof. A. Phadke' ORDER BY course_code LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 77080,
+  "wall_s": 77.08
+}

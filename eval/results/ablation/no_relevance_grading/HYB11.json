@@ -1,0 +1,22 @@
+{
+  "id": "HYB11",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "Neha Shah, you have one course with attendance below the 75% minimum requirement [Doc: Examination & Attendance Rules 2026-27 §2]:\n\n* **CS301 - Database Management Systems**: 66.9% attendance [SQL]\n\n**Can the shortfall be condoned?**\nYes. Since your attendance is 66.9%, which falls in the range of **at least 65% but below 75%**, the shortfall may be condoned on medical or other documented grounds [Doc: Examination & Attendance Rules 2026-27 §3]. \n\nTo receive condonation, you must meet the following conditions:\n1. Submit a condonation application with supporting documents (e.g. a medical certificate) to the Head of Department [Doc: Examination & Attendance Rules 2026-27 §3].\n2. Pay a **condonation fee of ₹500 per course** [Doc: Examination & Attendance Rules 2026-27 §3].\n3. Request the condonation before the last teaching day of the term [Doc: Examination & Attendance Rules 2026-27 §3].\n4. Note that a student may receive condonation in at most two courses per term [Doc: Examination & Attendance Rules 2026-27 §3]. \n\nIf attendance falls below 65%, or a condonation request is rejected, you will be detained in the course [Doc: Examination & Attendance Rules 2026-27 §4].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT c.course_code, c.title, e.attendance_pct FROM (SELECT * FROM enrollments WHERE student_id = 'S2024CS006') AS e JOIN courses AS c ON e.course_id = c.course_id WHERE e.student_id = 'S2024CS006' AND e.attendance_pct < 75 LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 1,
+  "latency_ms": 2915,
+  "wall_s": 2.92
+}

@@ -1,0 +1,22 @@
+{
+  "id": "HYB12",
+  "variant": "no_schema_cards",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "As a 3rd-year CS student with a CGPA of 9.01 (which meets the requirement of CGPA 9.01 ≥ 9.00) [Policy rules checked in code] and no overdue dues (has_overdue_dues is False) [Policy rules checked in code], you are eligible for a 25% merit concession on next year's tuition [Doc: Scholarship & Fee Concession Policy 2026-27 §2]. \n\nYour concession amount is calculated as 25% of your annual tuition fee of ₹1,45,000 [SQL]:\n* 25% × ₹1,45,000 = ₹36,250\n\nThis concession of ₹36,250 will be credited against next academic year's tuition and split proportionally across the two instalments [Doc: Scholarship & Fee Concession Policy 2026-27 §4].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT f.amount AS tuition_amount, f.academic_year, s.full_name, s.cgpa, NOT EXISTS(SELECT 1 FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2024CS007') AS l WHERE l.student_id = s.student_id AND l.status = 'overdue') AS no_overdue_fees FROM (SELECT * FROM students WHERE student_id = 'S2024CS007') AS s JOIN departments AS d ON s.dept_id = d.dept_id JOIN fee_structure AS f ON f.dept_id = s.dept_id AND f.year_of_study = s.year_of_study WHERE s.student_id = 'S2024CS007' AND f.component = 'tuition' AND f.academic_year = '2026-27' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 4709,
+  "wall_s": 4.71
+}

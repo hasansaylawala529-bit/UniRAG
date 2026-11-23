@@ -1,0 +1,22 @@
+{
+  "id": "H6",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "Krishna Iyer (student_id: S2025CS003) cannot renew their hostel room for next year [Hostel Rules & Allotment Policy 2026-27 §3]. \n\nTo be eligible for hostel renewal, all of the following conditions must be met:\n1. CGPA of 6.0 or higher at the time of renewal [Doc: Hostel Rules & Allotment Policy 2026-27 §3]: Your current CGPA is 7.45 (which is $\\ge 6.0$), so you meet this condition [SQL].\n2. No overdue fee dues of any kind in the fee ledger [Doc: Hostel Rules & Allotment Policy 2026-27 §3]: You do not meet this condition because you have an overdue fee entry in your fee ledger [SQL].\n3. No more than one recorded disciplinary warning in the current year [Doc: Hostel Rules & Allotment Policy 2026-27 §3].\n\nYour current overdue fee details:\n| Component | Amount Due | Outstanding Balance | Due Date | Status |\n|---|---|---|---|---|\n| tuition_inst1 (txn_id: 90) [SQL] | ₹87,000 [SQL] | ₹87,000 [SQL] | 14 Aug 2026 [SQL] | overdue [SQL] |\n\nAdditionally, please note that the renewal window runs from 1 April to 30 April 2027 [Doc: Hostel Rules & Allotment Policy 2026-27 §3].",
+  "facts_found": 2,
+  "facts_total": 2,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.cgpa, f.txn_id, f.component, f.amount_due, f.amount_paid, (f.amount_due - f.amount_paid) AS outstanding_balance, f.due_date, f.status FROM students AS s JOIN fee_ledger AS f ON s.student_id = f.student_id WHERE s.student_id = 'S2025CS003' AND f.status = 'overdue' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 1,
+  "latency_ms": 4052,
+  "wall_s": 4.05
+}

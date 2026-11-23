@@ -1,0 +1,22 @@
+{
+  "id": "SQL02",
+  "variant": "no_rule_engine",
+  "expected_route": "sql",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "There are four open research grants at Deccan Valley University of Technology (DVUT) with a deadline in January 2027 [SQL]. Applications are accepted only while a grant's status is open [Doc: Research Grant Policy 2026-27 §2].\n\nHere are the open grants with a January 2027 deadline:\n\n| Grant Code | Title | Application Deadline |\n|---|---|---|\n| GR-ML-02 | Undergraduate Machine Learning Research Assistantship [SQL] | 10 Jan 2027 [SQL] |\n| GR-IOT-07 | Smart Campus IoT Research Grant [SQL] | 20 Jan 2027 [SQL] |\n| GR-CY-03 | Cybersecurity Research Scholarship [SQL] | 31 Jan 2027 [SQL] |\n| GR-5G-15 | 5G and Next-Gen Networks Fellowship [SQL] | 31 Jan 2027 [SQL] |\n\nApplicants must apply before the deadline shown in the Grants Register, as late applications are not considered [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 7,
+  "facts_total": 7,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, application_deadline FROM grants WHERE status = 'open' AND application_deadline BETWEEN '2027-01-01' AND '2027-01-31' ORDER BY application_deadline LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 15096,
+  "wall_s": 15.1
+}

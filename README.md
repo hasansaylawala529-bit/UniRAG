@@ -68,6 +68,32 @@ python eval/run_adversarial.py --only PII04 SQLI02   # re-run selected cases; th
 Besides leaks, each case can list false claims seen in earlier runs (`must_not_claim`); an answer that makes one fails.
 Access policy (anonymous / student / staff, read-only, no e-mails): [`docs/security_policy.md`](docs/security_policy.md).
 
+## Ablation study
+```bash
+python eval/run_ablation.py                              # full system + 4 variants on the SQL and hybrid questions
+python eval/run_ablation.py --variant no_rule_engine     # one variant at a time (free-tier friendly)
+python eval/run_ablation.py --report                     # rebuild eval/results/ablation_summary.md + charts/ablation.png
+```
+Each variant switches off one component (`src/unirag/features.py`): semantic router, rule engine, relevance
+grading or schema-card retrieval. `UNIRAG_ABLATE=rule_engine` does the same for the UI or CLI.
+
+## Follow-up questions (multi-turn)
+```bash
+python -m unirag.cli chat --student S2026CS012           # interactive; /new forgets earlier turns, /quit exits
+python eval/run_conversations.py                         # 7 two-turn conversations -> eval/results/conversations_summary.md
+```
+Follow-ups ("And in IT?", "What about second year?") are detected without a model call and rewritten into a
+standalone question (one fast-model call). The whole pipeline, including every access-policy check, then runs on
+the rewritten question. In the web UI the history is kept per identity; **New conversation** clears it.
+
+## MCP server (Claude Desktop and other MCP clients)
+```bash
+python scripts/mcp_smoke.py                              # starts the server over stdio and calls every tool
+python -m unirag.mcp_server                              # what an MCP client runs (anonymous unless configured)
+```
+Tools `ask`, `search_policies` and `describe_data` are all read-only. The role is fixed by the server's configuration,
+never by a tool argument. Setup for Claude Desktop and the MCP Inspector: [`docs/mcp.md`](docs/mcp.md).
+
 ## Ask questions (full pipeline)
 ```bash
 python -m unirag.cli ask "I am a third-year CS student with a 3.8 GPA; what research grants am I eligible for, and what is the deadline to apply?" --trace
@@ -94,6 +120,10 @@ docker exec -it unirag-db psql -U unirag_admin -d unirag -c "SELECT grant_code, 
 | `scripts/run_hybrid_demo.py` | Runs the six hybrid questions and checks key facts |
 | `app/streamlit_app.py` | Demo interface (chat + trace panel) |
 | `scripts/warm_cache.py` | Pre-answers all demo examples |
+| `src/unirag/conversation.py` | Multi-turn follow-ups (detection, rewrite, identity per conversation) |
+| `src/unirag/mcp_server.py` | MCP server (stdio) |
+| `src/unirag/features.py` | Component switches for the ablation study |
+| `eval/` | Test sets and runners: evaluation, security, ablation, conversations |
 | `tests/` | Unit tests |
 | `docs/architecture.md` | Architecture and design decisions |
 | `prompts.md` | Prompt engineering log |

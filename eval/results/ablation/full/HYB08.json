@@ -1,0 +1,22 @@
+{
+  "id": "HYB08",
+  "variant": "full",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "Based on your CGPA of 7.75 (calculated as 3.1 ÷ 0.4) [Doc: Research Grant Policy 2026-27 §2], you are eligible for two currently open grants. Please note that applications are only accepted while the status is **open** [Doc: Research Grant Policy 2026-27 §2].\n\n### Open Grants\nYou may apply for the following grants:\n\n| Grant Code | Title | Amount | Deadline |\n| :--- | :--- | :--- | :--- |\n| GR-DS-05 | Data Science for Governance Fellowship | ₹50,000 | 31 Dec 2026 |\n| GR-OS-11 | Open Source Contribution Grant | ₹25,000 | 31 Dec 2026 |\n\n*   **Data Science for Governance Fellowship (GR-DS-05):** You meet the requirements (CGPA 7.75 ≥ 7.5; Year 2; Department: IT) [Doc: Research Grant Policy 2026-27 §3].\n*   **Open Source Contribution Grant (GR-OS-11):** You meet the requirements (CGPA 7.75 ≥ 7.0; Year 2; Department: IT) [Doc: Research Grant Policy 2026-27 §3].\n\n### Closed Grants\nThe **Hardware Hackathon Seed Fund (GR-HW-06)** is currently **closed** [SQL], meaning it is no longer accepting applications [Doc: Research Grant Policy 2026-27 §2].\n\nPlease ensure you submit your applications before the deadlines listed above, as late applications are not considered [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 5,
+  "facts_total": 5,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "compiled_from_rules",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-OS-11', 'GR-DS-05', 'GR-HW-06']) ORDER BY application_deadline",
+  "gen_requests": 2,
+  "api_calls": 0,
+  "latency_ms": 196,
+  "wall_s": 0.2
+}

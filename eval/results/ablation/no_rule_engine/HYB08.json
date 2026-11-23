@@ -1,0 +1,25 @@
+{
+  "id": "HYB08",
+  "variant": "no_rule_engine",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "As a second-year IT student with a 3.1 GPA (derived CGPA = 7.75) [Doc: Research Grant Policy 2026-27 §2], you are eligible for the following currently open grants:\n\n* **GR-OS-11 — Open Source Contribution Grant** [SQL]  \n  * *Eligibility:* CGPA 7.75 ≥ 7.0 [Doc: Research Grant Policy 2026-27 §3]; Year of study: 2 [Doc: Research Grant Policy 2026-27 §3]; Department: IT [Doc: Research Grant Policy 2026-27 §3].  \n  * *Deadline:* 31 Dec 2026 [SQL]\n* **GR-DS-05 — Data Science for Governance Fellowship** [SQL]  \n  * *Eligibility:* CGPA 7.75 ≥ 7.5 [Doc: Research Grant Policy 2026-27 §3]; Year of study: 2 (in 2, 3) [Doc: Research Grant Policy 2026-27 §3]; Department: IT [Doc: Research Grant Policy 2026-27 §3].  \n  * *Deadline:* 31 Dec 2026 [SQL]\n\n*(Note: Other grants in the database require higher CGPAs or different years/departments—such as GR-SUS-08 requiring CGPA ≥ 8.0, GR-SP-14 requiring CGPA ≥ 9.0, and GR-HW-06 requiring department/year combinations not fully met, or are not listed as currently open for your profile.)*",
+  "facts_found": 3,
+  "facts_total": 5,
+  "missing": [
+    "₹50,000",
+    "₹25,000"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, application_deadline FROM grants WHERE status = 'open' ORDER BY application_deadline LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 100661,
+  "wall_s": 100.66
+}

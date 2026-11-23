@@ -1,0 +1,24 @@
+{
+  "id": "H2",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**No.** Krishna Kale can receive hall tickets for the courses where his attendance meets the 75 % minimum, but not for **CS102**, whose attendance is only 73.5 % [SQL].\n\n**Why**\n\n| Course | Attendance % | Exam fee status |\n|--------|--------------|-----------------|\n| CS101 | 79.6 % | paid ₹3,500 [SQL] |\n| CS102 | 73.5 % | paid ₹3,500 [SQL] |\n| CS103 | 85.6 % | paid ₹3,500 [SQL] |\n| CS104 | 77.2 % | paid ₹3,500 [SQL] |\n| CS105 | 77.8 % | paid ₹3,500 [SQL] |\n\n* The examination fee for the term is fully paid for every course [Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets].\n* The minimum‑attendance rule requires **≥ 75 % in each registered course** [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance].\n* Attendance in CS102 (73.5 %) falls short of this threshold, so the hall ticket for that course cannot be issued.  \n* No detention applies (attendance ≥ 65 % in all courses) [Doc: Examination & Attendance Rules 2026-27 §4 Detention].\n\n**Result:** Hall tickets can be issued for CS101, CS103, CS104, and CS105, but not for CS102 unless an approved condonation is obtained (not shown in the evidence).",
+  "facts_found": 2,
+  "facts_total": 3,
+  "missing": [
+    "₹500"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT f.component, f.amount_due, f.amount_paid, f.status AS fee_status, c.course_code, e.status AS enrollment_status, e.attendance_pct FROM students AS s LEFT JOIN fee_ledger AS f ON s.student_id = f.student_id LEFT JOIN enrollments AS e ON s.student_id = e.student_id LEFT JOIN courses AS c ON e.course_id = c.course_id WHERE s.student_id = 'S2026CS003' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 72187,
+  "wall_s": 72.19
+}

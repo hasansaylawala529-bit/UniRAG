@@ -1,0 +1,22 @@
+{
+  "id": "H6",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**No – you are not eligible to renew your hostel room for the next academic year.**  \n\n**Why:**  \n\n| Requirement (Hostel Rules §3) | Your status | Meets requirement? |\n|---|---|---|\n| CGPA ≥ 6.0 | 7.45 ≥ 6.0 | ✅ [SQL] |\n| No overdue fee dues | Tuition Inst‑1 ₹87,000 is **overdue** (status “overdue”) | ❌ [SQL] |\n| ≤ 1 disciplinary warning | No record shown (assumed ≤ 1) | ✅ (not a blocking factor) |\n\nBecause you have an overdue tuition component, the condition “no overdue fee dues of any kind in the fee ledger” is not satisfied [Doc: Hostel Rules & Allotment Policy 2026-27 §3 Renewal for the next academic year]. Consequently, you cannot renew the hostel room during the renewal window (1 April – 30 April 2027) [Doc: Hostel Rules & Allotment Policy 2026-27 §3].\n\n**Overdue items in your ledger**\n\n| Component | Amount due | Amount paid | Status |\n|---|---|---|---|\n| tuition_inst1 | ₹87,000 | ₹0 | overdue [SQL] |\n\nYou must clear this overdue tuition balance (and obtain a no‑dues certificate) before you can apply for renewal in the next window.",
+  "facts_found": 2,
+  "facts_total": 2,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.student_id, s.full_name, s.cgpa, s.is_hosteller, fl.component, fl.amount_due, fl.amount_paid, fl.status FROM students AS s JOIN fee_ledger AS fl ON fl.student_id = s.student_id WHERE s.student_id = 'S2025CS003' ORDER BY fl.due_date LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 21201,
+  "wall_s": 21.2
+}

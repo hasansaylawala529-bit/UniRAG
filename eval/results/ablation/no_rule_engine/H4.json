@@ -1,0 +1,22 @@
+{
+  "id": "H4",
+  "variant": "no_rule_engine",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**No – you cannot add a 3‑credit elective now.**  \n\n- You are currently registered for **25 credits** [SQL] and the add/drop status is **“Add/drop period closed”** [SQL].  \n- Courses can be added **only during the add/drop period**, which for the 2026‑ODD term ended on **10 August 2026** [Doc: Course Registration & Credit Policy 2026-27 §4].  \n- Although your CGPA 8.82 ≥ 8.5 would allow up to **28 credits** with HoD approval [Doc: Course Registration & Credit Policy 2026-27 §3], the add/drop window is already closed, and the policy states that **no course can be added after the add/drop period** [Doc: Course Registration & Credit Policy 2026-27 §4].\n\nTherefore, adding another 3‑credit elective is not permitted at this time. If you need to change your load, you may consider withdrawing from an existing elective (subject to the 16‑credit minimum) before the last teaching day, but you cannot add a new one.",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.full_name, s.cgpa, SUM(c.credits) AS current_registered_credits, CASE WHEN CAST('2026-11-23' AS DATE) <= CAST('2026-08-14' AS DATE) THEN 'Within add/drop period' ELSE 'Add/drop period closed' END AS add_drop_status FROM students AS s JOIN enrollments AS e ON s.student_id = e.student_id JOIN courses AS c ON e.course_id = c.course_id WHERE s.student_id = 'S2023ENTC001' AND e.status = 'enrolled' AND e.term = '2026-ODD' GROUP BY s.full_name, s.cgpa LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 43352,
+  "wall_s": 43.35
+}

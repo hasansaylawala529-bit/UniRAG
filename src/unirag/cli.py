@@ -100,6 +100,40 @@ def cmd_ask(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_chat(args: argparse.Namespace) -> int:
+    """Interactive multi-turn session; follow-up questions are rewritten using earlier turns."""
+    from .conversation import Conversation
+
+    conv = Conversation(role="staff" if args.staff else None, student_id=args.student)
+    who = f"student {args.student}" if args.student else ("staff" if args.staff else "anonymous (not logged in)")
+    print(f"UniRAG chat as {who}. Commands: /new (forget earlier turns), /quit")
+    while True:
+        try:
+            q = input("\nyou> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return 0
+        if not q:
+            continue
+        if q.lower() in ("/quit", "/exit", "/q"):
+            return 0
+        if q.lower() == "/new":
+            conv.reset()
+            print("(new conversation)")
+            continue
+        try:
+            r = conv.ask(q)
+        except Exception as e:  # noqa: BLE001 - keep the session alive
+            print(f"error: {type(e).__name__}: {e}")
+            continue
+        c = r.extra.get("conversation", {})
+        if c.get("followup") and c.get("asked") != q:
+            print(f"  (follow-up, understood as: {c['asked']})")
+        print(f"\nunirag> {r.answer}")
+        print(f"  [{r.route}" + (f", refused by {r.refused_by}" if r.refused_by else "")
+              + f" · {r.gen_requests} model requests · {r.latency_ms / 1000:.1f} s · {r.verification['summary']}]")
+
+
 def cmd_guard(args: argparse.Namespace) -> int:
     try:
         g = guard_sql(args.sql, student_id=args.student)
@@ -137,6 +171,12 @@ def main(argv: list[str] | None = None) -> int:
     pa.add_argument("--trace", action="store_true", help="Show the per-node trace")
     pa.add_argument("--json", action="store_true", help="Print the full result as JSON")
     pa.set_defaults(func=cmd_ask)
+
+    pc = sub.add_parser("chat", help="Interactive multi-turn session with follow-up questions")
+    who = pc.add_mutually_exclusive_group()
+    who.add_argument("--student", help="Logged-in student_id")
+    who.add_argument("--staff", action="store_true", help="Staff access")
+    pc.set_defaults(func=cmd_chat)
 
     pg = sub.add_parser("guard", help="Check a SQL statement against the guard (no LLM, no DB)")
     pg.add_argument("sql")

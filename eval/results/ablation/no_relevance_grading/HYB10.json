@@ -1,0 +1,22 @@
+{
+  "id": "HYB10",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "If you withdraw from the university today (23 Nov 2026), you are **not eligible for any tuition refund** [Doc: Fee Payment & Refund Policy 2026-27 §6]. \n\nAccording to your records, it has been **74 days** since classes began (exceeding 30 days), and your total tuition paid is **₹1,45,000** [SQL].\n\n### Summary of Refund Policy for Withdrawals:\n* **Before classes begin:** 90% of tuition paid, less a processing fee of ₹1,000 [Doc: Fee Payment & Refund Policy 2026-27 §6]\n* **Within 14 days after classes begin:** 75% of tuition paid [Doc: Fee Payment & Refund Policy 2026-27 §6]\n* **15–30 days after classes begin:** 50% of tuition paid [Doc: Fee Payment & Refund Policy 2026-27 §6]\n* **More than 30 days after classes begin:** No refund [Doc: Fee Payment & Refund Policy 2026-27 §6]\n\nAdditionally, examination and laboratory fees are non-refundable once the term has started, and hostel fee refunds are governed separately by the Hostel Rules [Doc: Fee Payment & Refund Policy 2026-27 §6].",
+  "facts_found": 0,
+  "facts_total": 0,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT SUM(amount_paid) AS total_tuition_paid, (CAST('2026-10-27' AS DATE) - MIN(due_date)) AS days_since_classes_began FROM fee_ledger WHERE student_id = 'S2025CS001' AND component LIKE 'tuition%' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 1,
+  "latency_ms": 7868,
+  "wall_s": 7.87
+}

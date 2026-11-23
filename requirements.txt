@@ -21,4 +21,4 @@ matplotlib>=3.8
 # Tests
 pytest>=8.0
 # Stretch: MCP server
-mcp>=1.0
+mcp>=2.3,<3

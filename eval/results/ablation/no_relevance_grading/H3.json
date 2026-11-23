@@ -1,0 +1,22 @@
+{
+  "id": "H3",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**Total late fine accumulated as of 30 Nov 2026: ₹5,500** [SQL].\n\n**Break‑down of overdue components**\n\n| Component | Days overdue | Late fine |\n|-----------|--------------|-----------|\n| tuition_inst1 | 108 days | ₹5,000 [SQL] |\n| exam | 30 days | ₹500 [SQL] |\n\nThe database query already applied the university’s late‑fine rules (₹100 per day capped at ₹5,000 for tuition, and a flat ₹500 for the examination fee) and summed them to a total of **₹5,500** [SQL]【SQL】.",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "WITH overdue_fees AS (SELECT component, amount_due, amount_paid, due_date, (CAST('2026-11-30' AS DATE) - due_date) AS days_overdue FROM fee_ledger WHERE student_id = 'S2026CS012' AND status = 'overdue'), fine_calculations AS (SELECT component, amount_due, amount_paid, due_date, days_overdue, CASE WHEN component = 'exam' THEN 500 ELSE LEAST(days_overdue * 100, 5000) END AS late_fine FROM overdue_fees) SELECT component, amount_due, amount_paid, due_date, days_overdue, late_fine, SUM(late_fine) OVER () AS total_late_fine FROM fine_calculations LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 1,
+  "latency_ms": 45966,
+  "wall_s": 45.97
+}

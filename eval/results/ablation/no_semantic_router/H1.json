@@ -1,0 +1,33 @@
+{
+  "id": "H1",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**You can apply right now for four open research grants; their application deadlines are shown below.**  \n\n| Grant (code) | Title | Amount | Application deadline | Status |\n|---|---|---|---|---|\n| GR‑AI‑01 | AI for Social Good Research Fellowship | ₹1,50,000 | 20 Dec 2026 | open |\n| GR‑ML‑02 | Undergraduate Machine Learning Research Assistantship | ₹60,000 | 10 Jan 2027 | open |\n| GR‑CY‑03 | Cybersecurity Research Scholarship | ₹75,000 | 31 Jan 2027 | open |\n| GR‑SUS‑08 | Sustainability & Green Computing Grant | ₹70,000 | 28 Feb 2027 | open |\n\n*All four grants match your profile (CS department, Year 3, CGPA 9.5) – e.g., CGPA 9.5 ≥ 8.5 for GR‑AI‑01 [Doc: Research Grant Policy 2026‑27 §3 Grant‑specific eligibility > GR‑AI‑01]; CGPA 9.5 ≥ 9.0 for GR‑ML‑02 [Doc: … > GR‑ML‑02]; etc. The policy check confirms eligibility for each listed grant.*  \n\n**Closed or upcoming grants:**  \n- Closed (cannot apply): GR‑HW‑06 (deadline 15 Dec 2026) and GR‑ROB‑12 (deadline 31 Dec 2026) – status **closed** [SQL].  \n- Upcoming (will open later): GR‑HC‑10 (opens 05 Jan 2027) and GR‑SP‑14 (opens 01 Dec 2026) – status **upcoming** [SQL].\n\n**Next steps:** Prepare the required documents for each open grant (research proposal, grade card, etc.) and submit before the listed deadline. All applications must be submitted while the grant status is **open** (Rule 5, §2) [Doc: Research Grant Policy 2026‑27 §2 General eligibility rules].",
+  "facts_found": 8,
+  "facts_total": 18,
+  "missing": [
+    "GR-AI-01",
+    "GR-ML-02",
+    "GR-CY-03",
+    "GR-SUS-08",
+    "GR-HC-10",
+    "₹90,000",
+    "15 Mar 2027",
+    "GR-SP-14",
+    "₹40,000",
+    "31 Mar 2027"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": false,
+  "sql_mode": "compiled_from_rules",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-AI-01', 'GR-CY-03', 'GR-ML-02', 'GR-SUS-08', 'GR-ROB-12', 'GR-SP-14', 'GR-HC-10', 'GR-HW-06']) ORDER BY application_deadline",
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 95000,
+  "wall_s": 95.0
+}

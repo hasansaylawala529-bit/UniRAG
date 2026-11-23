@@ -1,0 +1,22 @@
+{
+  "id": "H3",
+  "variant": "no_rule_engine",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**Total late fine as of 30 Nov 2026: ₹5,500**【SQL】.\n\n| Component | Days overdue | Fine |\n|-----------|--------------|------|\n| tuition_inst1 | 108 | ₹5,000【SQL】 |\n| exam | 30 | ₹500【SQL】 |\n\nThe fine for the tuition instalment follows the policy of **₹100 per day, capped at ₹5,000 per component**【Doc: Fee Payment & Refund Policy 2026-27 §4】, and the examination fee carries a **flat ₹500** fine【Doc: Fee Payment & Refund Policy 2026-27 §4】. Summing the two component fines gives the total late fine of **₹5,500**【SQL】.",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "WITH overdue_fees AS (SELECT fl.component, fl.amount_due, fl.amount_paid, fl.due_date, (CAST('2026-11-30' AS DATE) - fl.due_date) AS days_overdue, CASE WHEN fl.component = 'exam' THEN 500 ELSE LEAST((CAST('2026-11-30' AS DATE) - fl.due_date) * 100, 5000) END AS fine FROM fee_ledger AS fl JOIN students AS s ON fl.student_id = s.student_id WHERE s.student_id = 'S2026CS012' AND fl.status = 'overdue') SELECT component, amount_due, amount_paid, due_date, days_overdue, fine, SUM(fine) OVER () AS total_late_fine FROM overdue_fees ORDER BY due_date LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 58884,
+  "wall_s": 58.88
+}

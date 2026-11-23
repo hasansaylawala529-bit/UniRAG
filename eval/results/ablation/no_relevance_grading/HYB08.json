@@ -1,0 +1,25 @@
+{
+  "id": "HYB08",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "**You meet the eligibility criteria for three DVUT research grants, but only two are currently open for application.**  \n\n| Grant (code) | Title | Amount | Application open | Deadline | Status | Why you qualify |\n|---|---|---|---|---|---|---|\n| GR‑DS‑05 | Data Science for Governance Fellowship | ₹50,000 | 05 Nov 2026 | 31 Dec 2026 | open | CGPA 7.75 ≥ 7.5, Year 2, Department IT [Doc: Research Grant Policy 2026‑27 §3] |\n| GR‑OS‑11 | Open Source Contribution Grant | ₹25,000 | 01 Nov 2026 | 31 Dec 2026 | open | CGPA 7.75 ≥ 7.0, Year 2, Department IT [Doc: Research Grant Policy 2026‑27 §3] |\n| GR‑HW‑06 | Hardware Hackathon Seed Fund | ₹30,000 | 01 Oct 2026 | 15 Dec 2026 | closed | CGPA 7.75 ≥ 7.0, Year 2, Department IT [Doc: Research Grant Policy 2026‑27 §3] |\n\n**Explanation of eligibility**\n\n* Your 4‑point GPA 3.1 converts to a 10‑point CGPA of **7.75** (3.1 ÷ 0.4) as required by the handbook §4 [Doc: Student Handbook 2026‑27 §4].  \n* The general rule that eligibility is based on the 10‑point CGPA applies to all grants [Doc: Research Grant Policy 2026‑27 §2].  \n* For each grant, you satisfy the minimum CGPA, year‑of‑study (2nd year), and department (IT) conditions listed in the grant‑specific sections §3.  \n\n**Next steps**\n\n* You can apply now for **GR‑DS‑05** and **GR‑OS‑11** (both status *open* per the register [SQL]).  \n* **GR‑HW‑06** is *closed*; you cannot apply until it reopens in a future cycle.  \n\nIf you need the required documents (e.g., pull‑request links for GR‑OS‑11 or a statement of purpose for GR‑DS‑05), see the respective grant sections in the policy.",
+  "facts_found": 3,
+  "facts_total": 5,
+  "missing": [
+    "GR-DS-05",
+    "GR-OS-11"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": false,
+  "sql_mode": "compiled_from_rules",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-OS-11', 'GR-DS-05', 'GR-HW-06']) ORDER BY application_deadline",
+  "gen_requests": 2,
+  "api_calls": 1,
+  "latency_ms": 14971,
+  "wall_s": 14.97
+}

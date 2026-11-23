@@ -1,0 +1,22 @@
+{
+  "id": "HYB09",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "No, you cannot apply for the **GR-CY-03 — Cybersecurity Research Scholarship** at this time. \n\nAlthough you meet the year of study and department requirements, you do not meet all the eligibility criteria [Policy rules checked in code]:\n* **GR-CY-03 eligibility CGPA:** Your CGPA of 7.95 is below the minimum required CGPA of 8.0 (cgpa 7.95 >= 8.0: no) [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-CY-03].\n* **GR-CY-03 additional condition overdue dues:** You have overdue fee dues in the University fee ledger (has_overdue_dues is True), violating the requirement to have no overdue fee dues on the date of application [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-CY-03].\n\nYour profile met the following rules [Policy rules checked in code]:\n* **GR-CY-03 eligibility year:** Your year of study (4) is eligible (year_of_study 4 in [3, 4]) [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-CY-03].\n* **GR-CY-03 eligibility department:** Your department (CS) is eligible (department CS in ['CS', 'IT']) [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-CY-03].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "compiled_from_rules",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-CY-03 eligibility year', 'GR-CY-03 eligibility department']) ORDER BY application_deadline",
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 74469,
+  "wall_s": 74.47
+}

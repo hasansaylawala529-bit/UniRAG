@@ -1,0 +1,22 @@
+{
+  "id": "H6",
+  "variant": "no_schema_cards",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "No, Krishna Iyer (S2025CS003) cannot renew their hostel room for next year because they currently have overdue fee dues [Doc: Hostel Rules & Allotment Policy 2026-27 §3]. \n\nUnder the hostel renewal policy, residents must meet all criteria, including having no overdue fee dues of any kind [Doc: Hostel Rules & Allotment Policy 2026-27 §3]. \n\nYour profile details against the renewal requirements are:\n* **CGPA:** 7.45 ≥ 6.0 (Pass) [Doc: Hostel Rules & Allotment Policy 2026-27 §3]\n* **Overdue dues:** `has_overdue_dues` is True (Fail) [Doc: Hostel Rules & Allotment Policy 2026-27 §3]\n\n**Overdue Fee Ledger Entry:**\n* **Transaction ID:** 90 [SQL]\n* **Component:** tuition_inst1 [SQL]\n* **Amount Due:** ₹87,000 [SQL]\n* **Outstanding Balance:** ₹87,000 [SQL]\n* **Due Date:** 14 Aug 2026 [SQL]\n* **Status:** overdue [SQL]\n\nYou must clear all overdue dues before you can be eligible for hostel renewal.",
+  "facts_found": 2,
+  "facts_total": 2,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.student_id, s.full_name, s.cgpa, f.txn_id, f.component, f.amount_due, f.amount_paid, (f.amount_due - f.amount_paid) AS outstanding_balance, f.due_date, f.status FROM students AS s JOIN fee_ledger AS f ON s.student_id = f.student_id WHERE s.student_id = 'S2025CS003' AND f.status = 'overdue' ORDER BY f.due_date LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 20740,
+  "wall_s": 20.74
+}

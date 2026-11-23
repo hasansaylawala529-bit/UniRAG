@@ -1,0 +1,22 @@
+{
+  "id": "SQL02",
+  "variant": "no_semantic_router",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "The following open grants have application deadlines in January 2027:\n\n| Grant Code | Title | Amount | Deadline |\n|------------|-------------------------------------------|----------|-----------|\n| GR-ML-02 | Undergraduate Machine Learning Research Assistantship | ₹60,000 | 10 Jan 2027 |\n| GR-IOT-07 | Smart Campus IoT Research Grant | ₹80,000 | 20 Jan 2027 |\n| GR-CY-03 | Cybersecurity Research Scholarship | ₹75,000 | 31 Jan 2027 |\n| GR-5G-15 | 5G and Next‑Gen Networks Fellowship | ₹1,10,000 | 31 Jan 2027 |\n\nAll four grants are currently **open** and their deadlines fall within January 2027 [SQL].",
+  "facts_found": 7,
+  "facts_total": 7,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": false,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE status = 'open' AND application_deadline BETWEEN CAST('2027-01-01' AS DATE) AND CAST('2027-01-31' AS DATE) ORDER BY application_deadline LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 27214,
+  "wall_s": 27.22
+}

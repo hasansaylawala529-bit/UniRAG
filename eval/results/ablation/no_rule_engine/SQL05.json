@@ -1,0 +1,22 @@
+{
+  "id": "SQL05",
+  "variant": "no_rule_engine",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "The Information Technology department is headed by Dr. Rajesh Iyer [SQL].\n\n| Position | Name |\n| :--- | :--- |\n| Head of Department | Dr. Rajesh Iyer [SQL] |",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT hod_name FROM departments WHERE name = 'Information Technology' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 336,
+  "wall_s": 0.34
+}

@@ -1,0 +1,22 @@
+{
+  "id": "SQL09",
+  "variant": "no_relevance_grading",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "You have two overdue fee items with outstanding balances [SQL]. Here are the details:\n\n* **tuition_inst1**: ₹45,000 outstanding balance (Due date: 14 Aug 2026) [SQL]\n* **exam**: ₹3,500 outstanding balance (Due date: 31 Oct 2026) [SQL]\n\nTotal outstanding balance: ₹45,000 + ₹3,500 = ₹48,500.\n\nPlease note that having overdue entries in your fee ledger means you are not issued a no-dues certificate, are not eligible for a merit fee concession or hostel renewal, and will have your results withheld if dues remain unpaid on the result declaration date [Doc: Fee Payment & Refund Policy 2026-27 §5 Consequences of overdue dues]. Additionally, a late fine of ₹100 per day (capped at ₹5,000 per component) is charged on overdue tuition instalments [Doc: Fee Payment & Refund Policy 2026-27 §4 Late payment fines].",
+  "facts_found": 2,
+  "facts_total": 2,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT component, amount_due, amount_paid, (amount_due - amount_paid) AS outstanding_balance, due_date FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2026CS012') AS fee_ledger WHERE student_id = 'S2026CS012' AND status = 'overdue' ORDER BY due_date ASC LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 1,
+  "latency_ms": 2389,
+  "wall_s": 2.39
+}

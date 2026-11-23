@@ -1,0 +1,22 @@
+{
+  "id": "H5",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "Yes, student S2025CS017 (Riya Shah) is eligible for a merit fee concession because her CGPA is 8.6, which falls in the 8.50 – 8.99 slab [Doc: Scholarship & Fee Concession Policy 2026-27 §2 Merit concession slabs], and she has no overdue entries in the fee ledger [Doc: Scholarship & Fee Concession Policy 2026-27 §3 Eligibility conditions]. \n\nThe concession amount is 15% of the annual tuition [Doc: Scholarship & Fee Concession Policy 2026-27 §2 Merit concession slabs]. Based on the annual tuition amount of ₹1,45,000 for the CS department year 2 [SQL], the concession is:\n* 15% × ₹1,45,000 = ₹21,750\n\nAs per the policy, this concession is credited against the next academic year's tuition and is split proportionally across the two instalments [Doc: Scholarship & Fee Concession Policy 2026-27 §4 Calculation and application].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.student_id, s.full_name, s.year_of_study, fs.component AS fee_component, fs.amount AS annual_tuition_amount, fl.component AS ledger_component, fl.amount_due, fl.amount_paid, (fl.amount_due - fl.amount_paid) AS outstanding_balance, fl.status FROM students AS s JOIN departments AS d ON s.dept_id = d.dept_id JOIN fee_structure AS fs ON fs.dept_id = s.dept_id AND fs.year_of_study = s.year_of_study AND fs.academic_year = '2026-27' AND fs.component = 'tuition' LEFT JOIN fee_ledger AS fl ON fl.student_id = s.student_id WHERE s.student_id = 'S2025CS017' AND d.code = 'CS' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 29034,
+  "wall_s": 29.03
+}

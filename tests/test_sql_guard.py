@@ -1,6 +1,6 @@
 import pytest
 
-from unirag.retrieval.sql_guard import GuardError, PrivacyError, guard_sql
+from unirag.retrieval.sql_guard import GuardError, HiddenColumnError, PrivacyError, guard_sql
 
 # ---------------------------------------------------------------- allowed
 def test_simple_select_gets_limit():
@@ -173,8 +173,24 @@ def test_anonymous_cannot_target_one_student_even_with_aggregates():
 
 @pytest.mark.parametrize("role,student", [("anonymous", None), ("student", "S2024CS007"), ("staff", None)])
 def test_emails_never_returned(role, student):
-    with pytest.raises(PrivacyError, match="Email"):
+    with pytest.raises(HiddenColumnError, match="(?i)e-?mail"):
         guard_sql("SELECT full_name, email FROM students", role=role, student_id=student)
+
+
+@pytest.mark.parametrize("sql", ["SELECT * FROM students", "SELECT s.* FROM students AS s",
+                                 "SELECT * FROM students s JOIN departments d ON s.dept_id = d.dept_id",
+                                 "SELECT full_name FROM (SELECT * FROM students) AS x",
+                                 "WITH x AS (SELECT * FROM students) SELECT full_name FROM x"])
+@pytest.mark.parametrize("role,student", [("anonymous", None), ("student", "S2024CS007"), ("staff", None)])
+def test_select_star_cannot_return_emails(sql, role, student):
+    with pytest.raises(HiddenColumnError):
+        guard_sql(sql, role=role, student_id=student)
+
+
+@pytest.mark.parametrize("sql", ["SELECT count(*) FROM students", "SELECT d.* FROM departments AS d",
+                                 "SELECT g.* FROM grants AS g", "SELECT full_name, cgpa FROM students"])
+def test_star_elsewhere_and_named_columns_are_allowed(sql):
+    assert guard_sql(sql, role="staff").sql
 
 
 def test_student_aggregates_are_not_scoped_to_self():

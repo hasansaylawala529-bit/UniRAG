@@ -1,0 +1,22 @@
+{
+  "id": "HYB12",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "As a student in the CS department with a CGPA of 9.01 and no overdue dues, you qualify for a merit concession of 25% on your next year's annual tuition fee [Profile used, Policy rules checked in code, Doc: Scholarship & Fee Concession Policy 2026-27 §2]. \n\nBased on your annual tuition fee of ₹1,45,000 [SQL], the calculation for your merit concession is:\n* 25% × ₹1,45,000 = ₹36,250 [Doc: Scholarship & Fee Concession Policy 2026-27 §2, §4]\n\n**Key details regarding your concession:**\n* **Eligibility:** You meet the requirement of having a CGPA of 9.01 ≥ 9.00 and have no overdue entries in the fee ledger [Profile used, Policy rules checked in code, Doc: Scholarship & Fee Concession Policy 2026-27 §2, §3]. (Note: To remain eligible, you must also have no F grade and no academic dishonesty findings in the current academic year [Doc: Scholarship & Fee Concession Policy 2026-27 §3]).\n* **Application:** The concession amount of ₹36,250 will be credited against your next academic year's tuition, split proportionally across the two instalments [Doc: Scholarship & Fee Concession Policy 2026-27 §4]. It is not paid out in cash and will lapse if you withdraw [Doc: Scholarship & Fee Concession Policy 2026-27 §4].\n* **Combining with support:** It can be held together with research grants, but cannot be combined with any other University tuition waiver (the larger of the two applies) [Doc: Scholarship & Fee Concession Policy 2026-27 §5].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT fs.amount AS annual_tuition_fee, (SELECT COUNT(*) FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2024CS007') AS fee_ledger WHERE student_id = 'S2024CS007' AND status = 'overdue') AS overdue_count FROM fee_structure AS fs JOIN departments AS d ON fs.dept_id = d.dept_id JOIN (SELECT * FROM students WHERE student_id = 'S2024CS007') AS s ON s.dept_id = d.dept_id WHERE s.student_id = 'S2024CS007' AND fs.component = 'tuition' AND fs.year_of_study = s.year_of_study AND fs.academic_year = '2026-27' LIMIT 1",
+  "gen_requests": 3,
+  "api_calls": 1,
+  "latency_ms": 2310,
+  "wall_s": 2.31
+}

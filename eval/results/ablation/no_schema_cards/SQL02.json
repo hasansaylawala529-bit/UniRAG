@@ -1,0 +1,22 @@
+{
+  "id": "SQL02",
+  "variant": "no_schema_cards",
+  "expected_route": "sql",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "The following open grants have their application deadlines in January 2027:\n\n* **GR-ML-02**: Undergraduate Machine Learning Research Assistantship — Deadline: 10 Jan 2027 [SQL]\n* **GR-IOT-07**: Smart Campus IoT Research Grant — Deadline: 20 Jan 2027 [SQL]\n* **GR-CY-03**: Cybersecurity Research Scholarship — Deadline: 31 Jan 2027 [SQL]\n* **GR-5G-15**: 5G and Next-Gen Networks Fellowship — Deadline: 31 Jan 2027 [SQL]\n\nAll applications must be submitted before their respective deadlines while their status in the University Grants Register remains open [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 7,
+  "facts_total": 7,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, application_deadline FROM grants WHERE status = 'open' AND application_deadline BETWEEN '2027-01-01' AND '2027-01-31' ORDER BY application_deadline LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 13934,
+  "wall_s": 13.94
+}

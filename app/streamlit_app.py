@@ -32,6 +32,7 @@ ROUTE_STYLE = {   # route -> (label, colour)
     "refused": ("REFUSED BY POLICY", "#b45309"),
 }
 STEP_NAMES = {
+    "rewrite": "Rewrote the follow-up question",
     "profile": "Read who is asking",
     "route": "Chose the data source",
     "retrieve_docs": "Searched policy documents",
@@ -83,12 +84,13 @@ def friendly_error(e: Exception) -> str:
 
 
 def run_question(question: str, student: str | None, role: str | None) -> None:
-    from unirag.graph import ask
-
+    conv = st.session_state.conversation
+    if conv.switch_identity(role, student) and st.session_state.history:
+        st.toast("Logged-in identity changed: a new conversation was started.")
     entry = {"question": question, "student": student, "role": role or "student", "result": None, "error": None}
     try:
         with st.spinner("Routing → retrieving → planning → answering → verifying…"):
-            entry["result"] = ask(question, student_id=student, role=role).to_dict()
+            entry["result"] = conv.ask(question).to_dict()
     except Exception as e:  # noqa: BLE001 - shown to the user, never a raw stack trace
         entry["error"] = {"message": friendly_error(e), "detail": f"{type(e).__name__}: {e}"}
     st.session_state.history.append(entry)
@@ -123,6 +125,9 @@ def footer(r: dict) -> str:
 # ------------------------------------------------------------------ state
 st.session_state.setdefault("history", [])
 st.session_state.setdefault("selected", None)
+if "conversation" not in st.session_state:
+    from unirag.conversation import Conversation
+    st.session_state.conversation = Conversation()
 
 # ------------------------------------------------------------------ sidebar
 with st.sidebar:
@@ -187,8 +192,9 @@ with st.sidebar:
                + (f"; Groq: {', '.join(m.removeprefix('groq:') for m in s.groq_fallback_models)}" if s.groq_api_key else "")
                + ")  \n"
                f"Reference date: {s.as_of_date:%d %b %Y}")
-    if st.button("Clear chat"):
+    if st.button("New conversation", help="Clear the chat and forget earlier turns (follow-up context)"):
         st.session_state.history, st.session_state.selected = [], None
+        st.session_state.conversation.reset()
         st.rerun()
 
 # ------------------------------------------------------------------ main area
@@ -210,6 +216,9 @@ with chat_col:
             who = (f" _(logged in as {entry['student']})_" if entry["student"]
                    else " _(staff)_" if entry.get("role") == "staff" else " _(not logged in)_")
             st.markdown(entry["question"] + who)
+            conv_info = (entry["result"] or {}).get("extra", {}).get("conversation", {})
+            if conv_info.get("followup") and conv_info.get("asked") != entry["question"]:
+                st.caption(f"↳ follow-up, understood as: *{conv_info['asked']}*")
         with st.chat_message("assistant"):
             if entry["error"]:
                 st.error(entry["error"]["message"])
@@ -268,6 +277,11 @@ with trace_col:
             if "understand" in trace and trace["understand"].get("sql_task"):
                 st.markdown("**Planner's data request**")
                 st.caption(trace["understand"]["sql_task"])
+            if "rewrite" in trace:
+                rw = trace["rewrite"]
+                st.info(f"Follow-up ({rw.get('detected_by')}): “{rw.get('original')}” → “{rw.get('rewritten')}”"
+                        + (f" · {rw['skipped']}" if rw.get("skipped") else "")
+                        + (" · rewrite discarded (it added a student ID)" if rw.get("discarded") else ""))
             if r.get("refused_by"):
                 st.warning(f"Refused by: {r['refused_by']} · role: {r.get('role')}")
             fixed = trace.get("synthesize", {}).get("fixed_message")

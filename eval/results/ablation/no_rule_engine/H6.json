@@ -1,0 +1,22 @@
+{
+  "id": "H6",
+  "variant": "no_rule_engine",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**No – Krishna Iyer (S2025CS003) cannot renew the hostel room for the next academic year until the overdue fee is cleared.**\n\n**Why**\n\n| Item | Detail |\n|------|--------|\n| CGPA | 7.45 ≥ 6.0 → meets the academic criterion [Doc: Hostel Rules & Allotment Policy 2026-27 §3] |\n| Overdue dues | Tuition installment ₹87,000 unpaid (outstanding balance ₹87,000) [SQL] |\n| Renewal rule | “no overdue fee dues of any kind in the fee ledger” is required for renewal [Doc: Hostel Rules & Allotment Policy 2026-27 §3] |\n| Consequence of overdue | Students with any overdue entry are **not eligible for hostel renewal** [Doc: Fee Payment & Refund Policy 2026-27 §5] |\n| Renewal window | 1 Apr – 30 Apr 2027 (not yet open) [Doc: Hostel Rules & Allotment Policy 2026-27 §3] |\n\n**What to do**  \nClear the ₹87,000 tuition overdue (pay the full amount or arrange a settlement) to obtain a no‑dues certificate; then you will be eligible to apply for renewal during the 1‑30 Apr 2027 window.",
+  "facts_found": 2,
+  "facts_total": 2,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.student_id, s.full_name, s.cgpa, fl.component, fl.amount_due, fl.amount_paid, fl.due_date, fl.status, (fl.amount_due - fl.amount_paid) AS outstanding_balance FROM students AS s JOIN fee_ledger AS fl ON fl.student_id = s.student_id WHERE s.student_id = 'S2025CS003' AND fl.status = 'overdue' ORDER BY fl.due_date LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 47498,
+  "wall_s": 47.5
+}

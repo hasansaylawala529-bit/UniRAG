@@ -1,0 +1,24 @@
+{
+  "id": "H4",
+  "variant": "full",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "No, you are not allowed to add another 3-credit elective this term.\n\nAlthough you are eligible for a credit overload due to your CGPA of 8.82 (which is ≥ 8.5) [Doc: Course Registration & Credit Policy 2026-27 §3], the add/drop period for the 2026-ODD term ended on 10 August 2026 [Doc: Course Registration & Credit Policy 2026-27 §4]. \n\nPer policy, no courses can be added after the add/drop period has concluded [Doc: Course Registration & Credit Policy 2026-27 §4].\n\n**Current Status:**\n*   **Total Registered Credits:** 25 [SQL]\n*   **Add/Drop Status:** Outside add/drop period (The add/drop period for the 2026-ODD term ended on 10 August 2026) [Doc: Course Registration & Credit Policy 2026-27 §4]",
+  "facts_found": 2,
+  "facts_total": 3,
+  "missing": [
+    "28"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT SUM(c.credits) AS total_registered_credits, CASE WHEN CAST('2026-11-23' AS DATE) BETWEEN CAST('2026-07-31' AS DATE) AND CAST('2027-01-15' AS DATE) THEN 'Within add/drop period' ELSE 'Outside add/drop period' END AS add_drop_status FROM enrollments AS e JOIN courses AS c ON e.course_id = c.course_id WHERE e.student_id = 'S2023ENTC001' AND e.term = '2026-ODD' AND e.status = 'enrolled' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 337,
+  "wall_s": 0.34
+}

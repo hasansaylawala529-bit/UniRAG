@@ -1,0 +1,22 @@
+{
+  "id": "HYB10",
+  "variant": "no_rule_engine",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "**No tuition refund will be given.**  \n\n- Your tuition paid to date is **₹21,75,000** [SQL].  \n- The earliest class for the current term started **299 days ago** [SQL].  \n- Because the withdrawal request is **more than 30 days after classes began**, the policy states **“No refund”** [Doc: Fee Payment & Refund Policy 2026-27 §6].  \n\nTherefore, the refundable amount of tuition is **₹0**.",
+  "facts_found": 0,
+  "facts_total": 0,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": false,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 2,
+  "sql": "SELECT SUM(fl.amount_paid) AS total_tuition_paid, MIN(t.start_time) AS earliest_class_time, CAST('2026-10-27' AS DATE) - CAST((CAST('2026-01-01' AS DATE) + MIN(t.start_time)) AS DATE) AS days_elapsed FROM fee_ledger AS fl JOIN enrollments AS e ON fl.student_id = e.student_id JOIN timetable AS t ON e.course_id = t.course_id WHERE fl.student_id = 'S2025CS001' AND fl.component IN ('tuition_inst1', 'tuition_inst2') AND t.term = '2026-ODD' GROUP BY fl.student_id LIMIT 200",
+  "gen_requests": 4,
+  "api_calls": 3,
+  "latency_ms": 82871,
+  "wall_s": 82.87
+}

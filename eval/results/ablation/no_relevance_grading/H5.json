@@ -1,0 +1,22 @@
+{
+  "id": "H5",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "Yes, Riya Shah (student_id S2025CS017) is eligible for a merit fee concession [Policy rules checked in code]. Her concession amount is **₹21,750** (15% of annual tuition).\n\n**Eligibility and Calculation Details:**\n* **CGPA:** 8.6, which falls into the 8.50 – 8.99 slab (eligible for 15% concession) [Doc: Scholarship & Fee Concession Policy 2026-27 §2]. Since CGPA 8.6 ≥ 8.50, this rule passes [Policy rules checked in code].\n* **Overdue dues:** She has no overdue entries in the fee ledger, passing the eligibility condition (has_overdue_dues is False) [Doc: Scholarship & Fee Concession Policy 2026-27 §3; Policy rules checked in code]. \n* **Calculation:** 15% × ₹1,45,000 [SQL] = ₹21,750 [Doc: Scholarship & Fee Concession Policy 2026-27 §4].\n* **Additional conditions:** To remain qualified, the student must have no F grades and no academic dishonesty findings in the current academic year [Doc: Scholarship & Fee Concession Policy 2026-27 §3]. The concession applies only to tuition, is credited against the next academic year's tuition split proportionally across two instalments, is not paid in cash, and lapses if the student withdraws [Doc: Scholarship & Fee Concession Policy 2026-27 §2, §4]. It cannot be combined with other University tuition waivers (the larger applies) [Doc: Scholarship & Fee Concession Policy 2026-27 §5].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.full_name, s.cgpa, fl.component, fl.amount_due - fl.amount_paid AS outstanding_balance, fl.status, fs.amount AS annual_tuition_fee FROM students AS s LEFT JOIN fee_ledger AS fl ON s.student_id = fl.student_id AND fl.status = 'overdue' JOIN departments AS d ON s.dept_id = d.dept_id JOIN fee_structure AS fs ON s.dept_id = fs.dept_id AND s.year_of_study = fs.year_of_study WHERE s.student_id = 'S2025CS017' AND d.code = 'CS' AND fs.component = 'tuition' AND fs.academic_year = '2026-27' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 1,
+  "latency_ms": 2537,
+  "wall_s": 2.54
+}

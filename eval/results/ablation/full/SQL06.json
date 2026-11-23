@@ -1,0 +1,22 @@
+{
+  "id": "SQL06",
+  "variant": "full",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "Prof. A. Phadke is teaching six courses this term. The course codes and their respective titles are listed below [SQL]:\n\n| Course Code | Title |\n| :--- | :--- |\n| CS204 | Object Oriented Programming |\n| CS304 | Software Engineering |\n| CS305 | DBMS Lab |\n| IT102 | Engineering Physics |\n| IT205 | DSA Lab |\n| IT4E1 | Deep Learning |",
+  "facts_found": 6,
+  "facts_total": 6,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT course_code, title FROM courses WHERE instructor = 'Prof. A. Phadke' ORDER BY course_code LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 405,
+  "wall_s": 0.41
+}

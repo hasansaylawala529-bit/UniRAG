@@ -212,9 +212,9 @@ def main() -> None:
         detail = rec.get("error") or f"{rec['outcome']:<9} {rec['layer']:<32} req={rec['gen_requests']}" + \
             (f"  LEAK: {', '.join(rec['leaks'])}" if rec.get("leaks") else "") + \
             (f"  MISLEADING: {', '.join(rec['misleading'])}" if rec.get("misleading") else "")
+        print(f"[{n:>2}/{len(cases)}] {c['id']:<7} {mark} {detail}")
         if c["id"] in only and "error" not in rec:
             print(f"          answer: {rec['answer'][:220]}")
-        print(f"[{n:>2}/{len(cases)}] {c['id']:<7} {mark} {detail}")
     after = checksum()
     ro = read_only_role_holds()
     ok_res = [r for r in results if "error" not in r]

@@ -49,11 +49,20 @@ class PrivacyError(GuardError):
     """Rejected by the access policy. Not sent back for self-repair: rewording cannot make it allowed."""
 
 
+class HiddenColumnError(PrivacyError):
+    """The query would return a column that is never returned (e-mail), by name or through SELECT *.
+
+    Unlike other privacy blocks this one can be repaired when the question did not ask for the column:
+    the same query without it is allowed ("List of all students" written as SELECT * FROM students).
+    """
+
+
 ROLES = ("anonymous", "student", "staff")
 # columns that identify or describe one person; unaggregated, they reveal individual records
 IDENTIFYING_COLUMNS = {"student_id", "full_name", "email", "cgpa", "gpa_4", "amount_due", "amount_paid", "paid_on",
                        "attendance_pct", "grade", "submitted_on", "admission_year", "is_hosteller"}
 NEVER_RETURNED = {"email"}
+TABLES_WITH_HIDDEN_COLUMNS = {"students"}       # tables that contain a NEVER_RETURNED column
 
 
 @dataclass
@@ -99,6 +108,28 @@ def _aggregate_only(tree: exp.Expression) -> bool:
                 if col.name.lower() in IDENTIFYING_COLUMNS and not _inside_aggregate(col, proj):
                     return False
     return True
+
+
+def _star_on_hidden_table(tree: exp.Expression, cte_names: set[str]) -> bool:
+    """True if any SELECT returns * (or t.*) from a table that contains a never-returned column.
+    COUNT(*) is not a projection of columns and is allowed."""
+    for sel in tree.find_all(exp.Select):
+        sources = {}
+        frm = sel.args.get("from") or sel.args.get("from_")
+        nodes = ([frm.this] if frm is not None and getattr(frm, "this", None) is not None else []) + \
+                [j.this for j in (sel.args.get("joins") or [])]
+        for node in nodes:
+            if isinstance(node, exp.Table) and node.name.lower() not in cte_names:
+                sources[(node.alias or node.name).lower()] = node.name.lower()
+        hidden = {a for a, t in sources.items() if t in TABLES_WITH_HIDDEN_COLUMNS}
+        if not hidden:
+            continue
+        for proj in sel.expressions:
+            if isinstance(proj, exp.Star):
+                return True
+            if isinstance(proj, exp.Column) and isinstance(proj.this, exp.Star) and proj.table.lower() in hidden:
+                return True
+    return False
 
 
 def _student_literals(tree: exp.Expression) -> set[str]:
@@ -153,7 +184,10 @@ def guard_sql(sql: str, *, student_id: str | None = None, max_limit: int = 200,
     notes: list[str] = []
     for col in tree.find_all(exp.Column):
         if col.name.lower() in NEVER_RETURNED:
-            raise PrivacyError("Email addresses are never returned by the assistant.")
+            raise HiddenColumnError("E-mail addresses are never returned by the assistant.")
+    if _star_on_hidden_table(tree, cte_names):
+        raise HiddenColumnError("SELECT * on the students table would return e-mail addresses, which are never "
+                                "returned by the assistant; name the columns you need.")
     personal = sorted({t for t in tables if t in PERSONAL_TABLES})
     if personal:
         aggregate = _aggregate_only(tree)

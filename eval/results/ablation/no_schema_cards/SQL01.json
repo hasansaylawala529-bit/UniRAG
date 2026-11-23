@@ -1,0 +1,22 @@
+{
+  "id": "SQL01",
+  "variant": "no_schema_cards",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "semantic",
+  "answer": "The total number of enrolled students in the Information Technology department is 64 [SQL].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT COUNT(*) AS total_students FROM students JOIN departments ON students.dept_id = departments.dept_id WHERE departments.code = 'IT' LIMIT 200",
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 193957,
+  "wall_s": 193.96
+}

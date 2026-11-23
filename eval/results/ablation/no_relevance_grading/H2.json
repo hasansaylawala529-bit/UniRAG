@@ -1,0 +1,24 @@
+{
+  "id": "H2",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "**No.** Krishna Kale can receive hall tickets for four of the five courses, but not for **CS102 – Engineering Physics** because the attendance requirement is not met.\n\n| Course (code) | Attendance | Exam‑fee status | Eligibility |\n|---------------|------------|----------------|-------------|\n| CS101 – Engineering Mathematics I | 79.6 % [SQL] | paid, ₹0 due [SQL] | ✅ meets ≥75 % |\n| **CS102 – Engineering Physics** | **73.5 %** [SQL] | paid, ₹0 due [SQL] | ❌ below 75 % |\n| CS103 – Programming in C | 85.6 % [SQL] | paid, ₹0 due [SQL] | ✅ meets ≥75 % |\n| CS104 – Basic Electrical Engineering | 77.2 % [SQL] | paid, ₹0 due [SQL] | ✅ meets ≥75 % |\n| CS105 – Programming Lab I | 77.8 % [SQL] | paid, ₹0 due [SQL] | ✅ meets ≥75 % |\n\n**Why CS102 blocks a full hall ticket**\n\n* Hall tickets are issued only when (1) the examination fee for the term is fully paid **and** (2) the student meets the attendance requirement for each listed course [Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets].  \n* The fee condition is satisfied for all courses (outstanding balance ₹0) [SQL].  \n* The attendance rule requires **≥ 75 %** in each registered course [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance]. CS102 has 73.5 %, which is below this threshold.  \n* The student is not detained (attendance > 65 %) [Doc: Examination & Attendance Rules 2026-27 §4 Detention], but detention is not required for eligibility; the 75 % minimum still applies.\n\n**Result:** Hall tickets can be issued for CS101, CS103, CS104, and CS105, but not for CS102. Therefore, Krishna Kale cannot obtain a hall ticket for **all** end‑semester exams this term.",
+  "facts_found": 2,
+  "facts_total": 3,
+  "missing": [
+    "₹500"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT c.course_code, c.title, e.attendance_pct, f.component, (f.amount_due - f.amount_paid) AS outstanding_balance, f.status AS fee_status FROM enrollments AS e JOIN courses AS c ON e.course_id = c.course_id LEFT JOIN fee_ledger AS f ON e.student_id = f.student_id AND f.component = 'exam' WHERE e.student_id = 'S2026CS003' AND e.term = '2026-ODD' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 1,
+  "latency_ms": 13372,
+  "wall_s": 13.37
+}

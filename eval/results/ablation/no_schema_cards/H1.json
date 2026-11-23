@@ -1,0 +1,27 @@
+{
+  "id": "H1",
+  "variant": "no_schema_cards",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "As a third-year Computer Science student with a 3.8 GPA (equivalent to a 9.5 CGPA [Doc: Research Grant Policy 2026-27 §2]), you are eligible for several research grants. Please note that you must apply before the deadline and only while the status is \"open\" [Doc: Research Grant Policy 2026-27 §2].\n\n### Currently Open Grants\nYou may apply for the following grants immediately:\n\n| Grant Code | Title | Amount | Deadline |\n| :--- | :--- | :--- | :--- |\n| GR-AI-01 | AI for Social Good Research Fellowship | ₹1,50,000 | 20 Dec 2026 |\n| GR-ML-02 | Undergraduate Machine Learning Research Assistantship | ₹60,000 | 10 Jan 2027 |\n| GR-CY-03 | Cybersecurity Research Scholarship | ₹75,000 | 31 Jan 2027 |\n| GR-SUS-08 | Sustainability & Green Computing Grant | ₹70,000 | 28 Feb 2027 |\n\n*   **GR-AI-01:** Eligible (CGPA 9.5 ≥ 8.5; Year 3) [Doc: Research Grant Policy 2026-27 §3].\n*   **GR-ML-02:** Eligible (CGPA 9.5 ≥ 9.0; Year 3) [Doc: Research Grant Policy 2026-27 §3].\n*   **GR-CY-03:** Eligible (CGPA 9.5 ≥ 8.0; Year 3) [Doc: Research Grant Policy 2026-27 §3]. Note: You must have no overdue fee dues to qualify [Doc: Research Grant Policy 2026-27 §3].\n*   **GR-SUS-08:** Eligible (CGPA 9.5 ≥ 8.0; Year 3) [Doc: Research Grant Policy 2026-27 §3].\n\n### Upcoming and Closed Grants\n*   **Upcoming:** GR-HC-10 (opens 05 Jan 2027) and GR-SP-14 (opens 01 Dec 2026).\n*   **Closed:** GR-HW-06 and GR-ROB-12 are closed and no longer accepting applications [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 14,
+  "facts_total": 18,
+  "missing": [
+    "₹90,000",
+    "15 Mar 2027",
+    "₹40,000",
+    "31 Mar 2027"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "compiled_from_rules",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-AI-01', 'GR-CY-03', 'GR-ML-02', 'GR-SUS-08', 'GR-ROB-12', 'GR-SP-14', 'GR-HC-10', 'GR-HW-06']) ORDER BY application_deadline",
+  "gen_requests": 2,
+  "api_calls": 0,
+  "latency_ms": 399,
+  "wall_s": 0.4
+}

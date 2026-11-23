@@ -1,0 +1,22 @@
+{
+  "id": "HYB12",
+  "variant": "no_rule_engine",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "You will receive a merit concession of **₹36,250** on next year's tuition [SQL]. \n\nBased on your student profile, here are the details of your eligibility and calculation:\n* **CGPA:** 9.01 (which satisfies the requirement of CGPA $\\ge$ 9.00 for a 25% concession) [SQL, Doc: Scholarship & Fee Concession Policy 2026-27 §2].\n* **Overdue Dues:** ₹0 (satisfying the eligibility condition of having no overdue entries in the fee ledger) [SQL, Doc: Scholarship & Fee Concession Policy 2026-27 §3].\n* **Calculation:** 25% × ₹1,45,000 (annual tuition fee) = ₹36,250 [SQL, Doc: Scholarship & Fee Concession Policy 2026-27 §2].\n\nThe concession is credited against next academic year's tuition, split proportionally across the two instalments [Doc: Scholarship & Fee Concession Policy 2026-27 §4].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.student_id, s.full_name, s.cgpa, fs.amount AS annual_tuition_fee, fs.amount * 0.25 AS concession_amount, COALESCE(MAX(CASE WHEN fl.status = 'overdue' THEN 1 ELSE 0 END), 0) AS has_overdue FROM (SELECT * FROM students WHERE student_id = 'S2024CS007') AS s JOIN departments AS d ON s.dept_id = d.dept_id JOIN fee_structure AS fs ON fs.dept_id = s.dept_id AND fs.year_of_study = s.year_of_study AND fs.component = 'tuition' AND fs.academic_year = '2026-27' LEFT JOIN (SELECT * FROM fee_ledger WHERE student_id = 'S2024CS007') AS fl ON fl.student_id = s.student_id WHERE s.student_id = 'S2024CS007' GROUP BY s.student_id, s.full_name, s.cgpa, fs.amount LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 7025,
+  "wall_s": 7.03
+}

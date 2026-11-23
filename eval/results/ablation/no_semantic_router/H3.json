@@ -1,0 +1,25 @@
+{
+  "id": "H3",
+  "variant": "no_semantic_router",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "As of 30 November 2026, Siddharth Ranade (S2026CS012) has accumulated a total late fine of **₹8,000** on overdue fees [SQL].\n\nHere is the breakdown of the overdue fee components and their respective late fines:\n\n* **tuition_inst1**: Due date 14 Aug 2026, 108 days overdue, fine per component ₹5,000 (capped at ₹5,000 per component [Doc: Fee Payment & Refund Policy 2026-27 §4 Late payment fines]) [SQL].\n* **exam**: Due date 31 Oct 2026, 30 days overdue, fine per component ₹3,000 [SQL].",
+  "facts_found": 1,
+  "facts_total": 3,
+  "missing": [
+    "₹500",
+    "₹5,500"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "WITH overdue_fees AS (SELECT component, amount_due, amount_paid, due_date, status, (CAST('2026-11-30' AS DATE) - due_date) AS days_overdue, LEAST((CAST('2026-11-30' AS DATE) - due_date) * 100, 5000) AS fine_per_component FROM fee_ledger WHERE student_id = 'S2026CS012' AND status = 'overdue') SELECT component, amount_due, amount_paid, due_date, status, days_overdue, fine_per_component, SUM(fine_per_component) OVER () AS total_late_fine FROM overdue_fees ORDER BY due_date LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 63158,
+  "wall_s": 63.16
+}

@@ -1,0 +1,22 @@
+{
+  "id": "HYB09",
+  "variant": "no_schema_cards",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "No, Ananya Nair cannot apply for the Cybersecurity Research Scholarship (GR-CY-03) because you do not meet all the eligibility criteria [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-CY-03 — Cybersecurity Research Scholarship]. \n\nHere are the specific reasons based on your profile:\n* **CGPA:** Your CGPA is 7.95, which is below the minimum required CGPA of 8.0 (CGPA 7.95 ≥ 8.0: no) [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-CY-03 — Cybersecurity Research Scholarship].\n* **Overdue Dues:** You have overdue fee dues in the University fee ledger, violating the condition that applicants must have no overdue fee dues (has_overdue_dues is True) [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-CY-03 — Cybersecurity Research Scholarship]. Your current outstanding fee components are:\n\n| Component | Outstanding Balance | Due Date |\n|---|---|---|\n| tuition_inst1 | ₹87,000 | 14 Aug 2026 [SQL] |\n| lab | ₹8,000 | 14 Aug 2026 [SQL] |\n\nYou do meet the criteria for your year of study (Year 4 is in Year 3, Year 4) and department (CS is in CS, IT) [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-CY-03 — Cybersecurity Research Scholarship].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT component, (amount_due - amount_paid) AS outstanding_balance, due_date FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2023CS006') AS fee_ledger WHERE student_id = 'S2023CS006' AND amount_due > amount_paid ORDER BY due_date ASC LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 8304,
+  "wall_s": 8.31
+}

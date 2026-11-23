@@ -1,0 +1,22 @@
+{
+  "id": "SQL07",
+  "variant": "no_rule_engine",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "The average CGPA of third-year Computer Science (CS) students is 8.21 [SQL].\n\nThis figure represents the average CGPA for all students in the CS department currently in their third year of study [SQL].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT ROUND(CAST(AVG(s.cgpa) AS DECIMAL), 2) AS average_cgpa FROM students AS s JOIN departments AS d ON s.dept_id = d.dept_id WHERE d.code = 'CS' AND s.year_of_study = 3 LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 328,
+  "wall_s": 0.33
+}

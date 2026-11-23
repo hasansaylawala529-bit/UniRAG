@@ -10,9 +10,11 @@ from pydantic import BaseModel, Field
 
 from ..config import get_settings
 from ..db import connect, jsonable
+from ..features import FEATURES
+from ..profile import is_contact_request
 from ..llm import get_llm
 from ..prompts import render
-from .sql_guard import GuardError, PrivacyError, guard_sql
+from .sql_guard import GuardError, HiddenColumnError, PrivacyError, guard_sql
 
 HUB_TABLES = ("students", "departments", "courses", "grants")
 
@@ -47,6 +49,7 @@ class SQLResult:
     error: str | None = None
     models_used: list[str] = field(default_factory=list)
     privacy_block: str | None = None          # set when the access policy refused the query
+    hidden_column: bool = False               # the block was a never-returned column (e-mail), not the role
 
     @property
     def unanswerable(self) -> bool:
@@ -66,7 +69,12 @@ class SQLResult:
 
 
 def retrieve_schema_cards(question: str, k: int = 4) -> list[tuple[str, str]]:
-    """Top-k cards by similarity, plus hub tables that the chosen cards join to."""
+    """Top-k cards by similarity, plus hub tables that the chosen cards join to.
+    With the schema_cards component disabled (ablation) every card is returned: the full schema."""
+    if not FEATURES.schema_cards:
+        with connect() as conn, conn.cursor() as cur:
+            cur.execute("SELECT table_name, card_text FROM schema_cards ORDER BY table_name")
+            return cur.fetchall()
     qv = get_llm().embed_one(question, task_type="RETRIEVAL_QUERY")
     with connect() as conn, conn.cursor() as cur:
         cur.execute("SELECT table_name, card_text FROM schema_cards ORDER BY embedding <=> %s::vector LIMIT %s",
@@ -116,6 +124,7 @@ def answer_sql(question: str, *, student_id: str | None = None, extra_context: s
     draft: SQLDraft = llm.generate(prompt, schema=SQLDraft)  # type: ignore[assignment]
     models = [getattr(llm, "last_model_used", None) or s.gen_model]
 
+    hidden_retry_used = False
     for attempt_no in range(max_retries + 1):
         att = SQLAttempt(sql=draft.sql)
         attempts.append(att)
@@ -127,11 +136,23 @@ def answer_sql(question: str, *, student_id: str | None = None, extra_context: s
                              [t for t, _ in cards], entities, attempts, prompt_ids,
                              int((time.perf_counter() - t0) * 1000), models_used=models)
         except PrivacyError as e:
-            # the access policy is not a bug to repair: stop here, never ask the model to work around it
-            att.error = f"PrivacyError: {e}"
+            att.error = f"{type(e).__name__}: {e}"
+            hidden = isinstance(e, HiddenColumnError)
+            # A query that only drags in the e-mail column (SELECT * FROM students) is regenerated once without
+            # it, unless the question asked for contact data. The new query passes the guard like any other.
+            if hidden and not hidden_retry_used and attempt_no < max_retries and not is_contact_request(question):
+                hidden_retry_used = True
+                prompt, pid = render("sql_repair", failed_sql=draft.sql,
+                                     error=att.error + " Select only the columns the question needs, by name; "
+                                     "never select email.", **common)
+                prompt_ids.append(pid)
+                draft = llm.generate(prompt, schema=SQLDraft)  # type: ignore[assignment]
+                models.append(getattr(llm, "last_model_used", None) or s.gen_model)
+                continue
+            # any other access-policy block is final: never ask the model to work around it
             return SQLResult(question, False, None, [], [], draft.explanation, [], [t for t, _ in cards], entities,
                              attempts, prompt_ids, int((time.perf_counter() - t0) * 1000), error=att.error,
-                             models_used=models, privacy_block=str(e))
+                             models_used=models, privacy_block=str(e), hidden_column=hidden)
         except (GuardError, psycopg.Error) as e:
             att.error = f"{type(e).__name__}: {str(e).strip().splitlines()[0]}"
             if attempt_no == max_retries:

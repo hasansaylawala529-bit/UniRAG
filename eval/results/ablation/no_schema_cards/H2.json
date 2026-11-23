@@ -1,0 +1,24 @@
+{
+  "id": "H2",
+  "variant": "no_schema_cards",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "As UniRAG, assistant of Deccan Valley University of Technology (DVUT), here is the answer regarding your hall ticket:\n\nNo, student Krishna Kale (S2026CS003) cannot get the hall ticket for **all** end-semester exams this term because attendance in one course falls below the minimum requirement. \n\nTo receive a hall ticket, two conditions must be met: the examination fee must be fully paid, and the student must meet the attendance requirement of at least 75% in each registered course (or have an approved condonation) [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance, Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets]. Attendance between 65% and 75% can be condoned, while attendance below 65% results in detention [Doc: Examination & Attendance Rules 2026-27 §4 Detention].\n\nHere is the breakdown of your courses:\n* **CS101 (Engineering Mathematics I):** 79.6% attendance [SQL] — Eligible (79.6% ≥ 75) [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance].\n* **CS102 (Engineering Physics):** 73.5% attendance [SQL] — Eligible for condonation consideration (between 65% and 75%).\n* **CS103 (Programming in C):** 85.6% attendance [SQL] — Eligible (85.6% ≥ 75) [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance].\n* **CS104 (Basic Electrical Engineering):** 77.2% attendance [SQL] — Eligible (77.2% ≥ 75) [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance].\n* **CS105 (Programming Lab I):** 77.8% attendance [SQL] — Eligible (77.8% ≥ 75) [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance].\n\nAdditionally, your examination fee is fully paid with ₹0 outstanding balance [SQL], satisfying the fee payment requirement [Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets].",
+  "facts_found": 2,
+  "facts_total": 3,
+  "missing": [
+    "₹500"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT f.component, f.amount_due, f.amount_paid, (f.amount_due - f.amount_paid) AS outstanding_balance, f.status AS fee_status, c.course_code, c.title AS course_title, e.attendance_pct, e.status AS enrollment_status FROM students AS s JOIN fee_ledger AS f ON s.student_id = f.student_id JOIN enrollments AS e ON s.student_id = e.student_id JOIN courses AS c ON e.course_id = c.course_id WHERE s.student_id = 'S2026CS003' AND f.component = 'exam' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 5084,
+  "wall_s": 5.09
+}

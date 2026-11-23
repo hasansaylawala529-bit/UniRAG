@@ -1,0 +1,24 @@
+{
+  "id": "H2",
+  "variant": "no_rule_engine",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "**No.** Krishna Kale can receive hall tickets for four of the five courses, but not for **CS102 – Engineering Physics** because the attendance there is below the required 75 % and no approved condonation is on record.\n\n**Eligibility check**\n\n| Course (code) | Attendance | Exam fee | Hall‑ticket eligibility |\n|---------------|------------|----------|--------------------------|\n| CS101 – Engineering Mathematics I | 79.6 % [SQL] | paid [SQL] | ✅ |\n| CS102 – Engineering Physics | 73.5 % [SQL] | paid [SQL] | ❌ (attendance < 75 %) |\n| CS103 – Programming in C | 85.6 % [SQL] | paid [SQL] | ✅ |\n| CS104 – Basic Electrical Engineering | 77.2 % [SQL] | paid [SQL] | ✅ |\n| CS105 – Programming Lab I | 77.8 % [SQL] | paid [SQL] | ✅ |\n\n* The hall ticket is issued only when **(1)** the examination fee for the term is fully paid **[Doc: Examination & Attendance Rules 2026‑27 §5 Hall tickets]** – satisfied for all courses, and **(2)** the student meets the attendance requirement **[Doc: Examination & Attendance Rules 2026‑27 §2 Minimum attendance]** (≥ 75 % per course) or has an approved condonation.  \n* Attendance in CS102 (73.5 %) falls short of the 75 % threshold, and there is no evidence of a condonation, so the course is omitted from the hall ticket.  \n* Attendance is above 65 % for all courses, so detention does not apply **[Doc: Examination & Attendance Rules 2026‑27 §4 Detention]**.  \n\n**Result:** Hall tickets will be issued for CS101, CS103, CS104, and CS105; CS102 will be left off the ticket.",
+  "facts_found": 2,
+  "facts_total": 3,
+  "missing": [
+    "₹500"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.student_id, s.full_name, c.course_code, c.title AS course_title, e.attendance_pct, e.status AS enrollment_status, fl.component AS fee_component, fl.status AS exam_fee_status, (fl.amount_due - fl.amount_paid) AS outstanding_balance FROM students AS s JOIN enrollments AS e ON s.student_id = e.student_id JOIN courses AS c ON e.course_id = c.course_id LEFT JOIN fee_ledger AS fl ON s.student_id = fl.student_id AND fl.component = 'exam' WHERE s.student_id = 'S2026CS003' ORDER BY c.course_code LIMIT 50",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 130229,
+  "wall_s": 130.23
+}

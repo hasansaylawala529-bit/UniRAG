@@ -1,0 +1,22 @@
+{
+  "id": "HYB07",
+  "variant": "full",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "As a final-year ENTC student with a CGPA of 8.2, you are eligible for several research grants. Please note that you may hold at most two research grants at the same time [Doc: Research Grant Policy 2026-27 §2].\n\n### Open Grants (Available for Application)\nYou may apply for the following grants, as your CGPA of 8.2 meets the minimum requirements for each [Doc: Research Grant Policy 2026-27 §3].\n\n| Grant Code | Title | Amount | Deadline |\n| :--- | :--- | :--- | :--- |\n| GR-IOT-07 | Smart Campus IoT Research Grant | ₹80,000 | 20 Jan 2027 |\n| GR-5G-15 | 5G and Next-Gen Networks Fellowship | ₹1,10,000 | 31 Jan 2027 |\n| GR-VLSI-09 | VLSI Design Research Fellowship | ₹1,20,000 | 10 Feb 2027 |\n| GR-SUS-08 | Sustainability & Green Computing Grant | ₹70,000 | 28 Feb 2027 |\n| GR-ENT-13 | Student Startup Seed Grant | ₹2,00,000 | 01 Mar 2027 |\n\n*Data source: [SQL]*\n\n### Closed Grants\nThe following grants are currently closed and are no longer accepting applications [Doc: Research Grant Policy 2026-27 §2]:\n*   **GR-HW-06:** Hardware Hackathon Seed Fund (Deadline: 15 Dec 2026) [SQL]\n*   **GR-ROB-12:** Autonomous Robotics Research Grant (Deadline: 31 Dec 2026) [SQL]\n\nEnsure you submit your applications before the respective deadlines, as late applications are not considered [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 15,
+  "facts_total": 15,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "compiled_from_rules",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-ENT-13', 'GR-5G-15', 'GR-VLSI-09', 'GR-SUS-08', 'GR-HW-06', 'GR-IOT-07', 'GR-ROB-12']) ORDER BY application_deadline",
+  "gen_requests": 2,
+  "api_calls": 0,
+  "latency_ms": 235,
+  "wall_s": 0.24
+}

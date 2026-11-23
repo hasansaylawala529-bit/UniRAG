@@ -1,0 +1,22 @@
+{
+  "id": "SQL08",
+  "variant": "no_semantic_router",
+  "expected_route": "sql",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "There are currently 2 seats free in the CS3E1 Machine Learning elective [SQL].\n\n| Course Code | Title | Capacity | Enrolled Count | Free Seats |\n| :--- | :--- | :--- | :--- | :--- |\n| CS3E1 | Machine Learning | 15 | 13 | 2 |\n\nPer university policy, each elective has a fixed capacity, and once full, additional requests are placed on a waiting list [Doc: Course Registration & Credit Policy 2026-27 §5 Elective capacity and waiting lists].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "WITH c AS (SELECT c.course_id, c.course_code, c.title, c.capacity FROM courses AS c JOIN departments AS d ON c.dept_id = d.dept_id WHERE c.course_code = 'CS3E1'), e AS (SELECT e.course_id, COUNT(*) AS enrolled_cnt FROM enrollments AS e WHERE e.status = 'enrolled' AND e.term = '2026-ODD' GROUP BY e.course_id) SELECT c.course_code, c.title, c.capacity, COALESCE(e.enrolled_cnt, 0) AS enrolled_count, c.capacity - COALESCE(e.enrolled_cnt, 0) AS free_seats FROM c LEFT JOIN e ON c.course_id = e.course_id LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 99579,
+  "wall_s": 99.58
+}

@@ -1,0 +1,24 @@
+{
+  "id": "CONV02",
+  "identity": "anonymous",
+  "turns": [
+    "Who heads the Computer Science department?",
+    "What about Information Technology?"
+  ],
+  "first_answer": "The Computer Science department is headed by Dr. Meera Kulkarni [SQL].",
+  "detected": true,
+  "detected_by": "opener",
+  "asked": "Who heads the Information Technology department?",
+  "rewrite_ok": true,
+  "answer": "The Information Technology department is headed by Dr. Rajesh Iyer [SQL].\n\n| Position | Name |\n| :--- | :--- |\n| Head of Department | Dr. Rajesh Iyer [SQL] |",
+  "route": "sql",
+  "refused_by": null,
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "leaks": [],
+  "policy_ok": true,
+  "passed": true,
+  "gen_requests_turn2": 4
+}

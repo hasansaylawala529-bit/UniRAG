@@ -1,0 +1,28 @@
+{
+  "id": "HYB07",
+  "variant": "no_relevance_grading",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "**You can apply now to all open research grants that match a final‑year ENTC student with CGPA 8.2.**  \n\n| Grant (code) | Title | Amount | Application opens | Deadline | Status |\n|--------------|-------|--------|-------------------|----------|--------|\n| GR‑IOT‑07 | Smart Campus IoT Research Grant | ₹80,000 | 01 Nov 2026 | 20 Jan 2027 | open [SQL] |\n| GR‑5G‑15 | 5G and Next‑Gen Networks Fellowship | ₹1,10,000 | 01 Nov 2026 | 31 Jan 2027 | open [SQL] |\n| GR‑VLSI‑09 | VLSI Design Research Fellowship | ₹1,20,000 | 20 Nov 2026 | 10 Feb 2027 | open [SQL] |\n| GR‑SUS‑08 | Sustainability & Green Computing Grant | ₹70,000 | 01 Nov 2026 | 28 Feb 2027 | open [SQL] |\n| GR‑ENT‑13 | Student Startup Seed Grant | ₹2,00,000 | 01 Nov 2026 | 01 Mar 2027 | open [SQL] |\n\n**Eligibility** – Your CGPA 8.2 meets or exceeds every grant’s minimum (≥ 7.5 for GR‑ENT‑13; ≥ 8.0 for the others) as required in the Research Grant Policy 2026‑27 §3 (e.g., GR‑5G‑15 ≥ 8.0 [Doc: Research Grant Policy 2026‑27 §3 Grant‑specific eligibility > GR‑5G‑15]) and you are in Year 4 of ENTC, which is an eligible year for all listed grants.  \n\n**Note:** A student may hold at most **two** research grants simultaneously (General rule §2‑3) and must submit the application before each deadline (General rule §2‑4).  \n\nClosed grants (GR‑HW‑06, GR‑ROB‑12) are no longer accepting applications.",
+  "facts_found": 10,
+  "facts_total": 15,
+  "missing": [
+    "GR-IOT-07",
+    "GR-SUS-08",
+    "GR-VLSI-09",
+    "GR-ENT-13",
+    "GR-5G-15"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": false,
+  "sql_mode": "compiled_from_rules",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-ENT-13', 'GR-5G-15', 'GR-VLSI-09', 'GR-SUS-08', 'GR-HW-06', 'GR-IOT-07', 'GR-ROB-12']) ORDER BY application_deadline",
+  "gen_requests": 2,
+  "api_calls": 1,
+  "latency_ms": 73584,
+  "wall_s": 73.59
+}

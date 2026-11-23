@@ -1,0 +1,24 @@
+{
+  "id": "CONV04",
+  "identity": "anonymous",
+  "turns": [
+    "What is the minimum attendance needed to take an end-semester exam?",
+    "And what does condonation cost per course?"
+  ],
+  "first_answer": "To take a course's end-semester examination, a student must have at least **75% attendance** in each registered course [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance]. Attendance is counted separately for every course and is not averaged across courses [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance].\n\n### Exceptions and Conditions\n\n* **Condonation (65% to below 75%):** If attendance in a course is at least 65% but below 75%, the shortfall may be condoned on medical or other documented grounds [Doc: Examination & Attendance Rules 2026-27 §3 Condonation of attendance]. To request condonation, the student must submit an application with supporting documents to the Head of Department before the last teaching day of the term, along with a fee of **₹500 per course** [Doc: Examination & Attendance Rules 2026-27 §3 Condonation of attendance]. Condonation is permitted for at most two courses per term [Doc: Examination & Attendance Rules 2026-27 §3 Condonation of attendance].\n* **Detention (Below 65%):** If attendance falls below 65%, or if a condonation request is rejected, the student is detained in that course, cannot take its end-semester examination, and must re-register for the course when it is next offered [Doc: Examination & Attendance Rules 2026-27 §4 Detention].",
+  "detected": true,
+  "detected_by": "opener",
+  "asked": "What does attendance condonation cost per course?",
+  "rewrite_ok": true,
+  "answer": "The condonation fee for attendance is ₹500 per course [Doc: Examination & Attendance Rules 2026-27 §3].\n\nTo be eligible for condonation, the following conditions must be met:\n* **Attendance Requirement:** Your attendance in the course must be at least 65% but below 75% [Doc: Examination & Attendance Rules 2026-27 §3].\n* **Documentation:** You must submit an application with supporting documents, such as a medical certificate, to the Head of Department [Doc: Examination & Attendance Rules 2026-27 §3].\n* **Deadline:** The request must be made before the last teaching day of the term [Doc: Examination & Attendance Rules 2026-27 §3].\n* **Limit:** A student may receive condonation in at most two courses per term [Doc: Examination & Attendance Rules 2026-27 §3].",
+  "route": "docs",
+  "refused_by": null,
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "leaks": [],
+  "policy_ok": true,
+  "passed": true,
+  "gen_requests_turn2": 3
+}

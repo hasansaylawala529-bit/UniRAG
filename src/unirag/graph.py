@@ -24,6 +24,7 @@ from typing import Annotated, Any, Callable, TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from .config import get_settings
+from .features import FEATURES, UNGRADED_TOP_K
 from .llm import get_llm
 from .planner.rules import RuleEvaluation, evaluate_rules
 from .planner.understand import Understanding, understand
@@ -51,6 +52,11 @@ LOGIN_MESSAGE = ("This question is about your own records (fees, attendance, enr
 CONTACT_MESSAGE = ("Students' contact details (e-mail addresses and phone numbers) are never shared by the "
                    "assistant, whatever the role. To reach a student, please go through the Academic Office.")
 # fixed answers for database outcomes, so the model never improvises a claim about what the data contains
+EMAIL_OMITTED_MESSAGE = ("That query would have included students' e-mail addresses, which are never shared by the "
+                         "assistant. Please ask for the specific details you need, for example names, departments, "
+                         "years or CGPA.")
+SCOPED_NOTE = ("As a student you can see only your own records, so this answer covers your own record only; "
+               "other students' records need staff access.")
 UNANSWERABLE_MESSAGE = ("The university database doesn't hold that information, or it isn't accessible to the "
                         "assistant. I can answer questions about fees and dues, research grants, courses, "
                         "enrolments, attendance, timetables and university policies.")
@@ -119,6 +125,46 @@ def traced(name: str) -> Callable:
     return deco
 
 
+def refusal_for_block(r, role: str, ents: QuestionEntities) -> str:
+    """The message for a query the SQL guard refused, with the reason that fits the question and the role.
+
+    The contact-details message is only for questions that ask for contact data; a query that merely included
+    the e-mail column (and could not be regenerated without it) gets the role's own reason.
+    """
+    if r.hidden_column and ents.contact_request:
+        return CONTACT_MESSAGE
+    if role == "student":
+        return OWN_RECORDS_MESSAGE
+    if role == "anonymous":
+        return STAFF_ONLY_MESSAGE
+    return EMAIL_OMITTED_MESSAGE if r.hidden_column else r.privacy_block
+
+
+def scoped_to_own_records(state: State) -> bool:
+    """A student's query about others (not 'my ...') that the guard narrowed to the student's own rows."""
+    r = state.get("sql")
+    if state.get("role") != "student" or r is None or not r.ok or not r.rows or not r.attempts:
+        return False
+    ents = state.get("entities")
+    return (any(n.startswith("Scoped") for n in r.attempts[-1].guard_notes)
+            and not (ents is not None and ents.first_person))
+
+
+def policy_refusal(ents: QuestionEntities, role: str, student_id: str | None) -> tuple[str, str] | None:
+    """Deterministic access-policy checks on a question: (message, rule) when it must be refused, else None."""
+    if ents.write_intent:
+        return WRITE_MESSAGE, "write-intent rule"
+    if ents.contact_request:
+        return CONTACT_MESSAGE, "privacy rule (contact data)"
+    if role == "student" and ents.student_id and ents.student_id != student_id:
+        return OWN_RECORDS_MESSAGE, "privacy rule (other student)"
+    if role == "anonymous" and ents.student_id:
+        return STAFF_ONLY_MESSAGE, "privacy rule (named student)"
+    if ents.personal_records and not student_id and not ents.student_id:
+        return LOGIN_MESSAGE, "privacy rule (not logged in)"
+    return None
+
+
 # ------------------------------------------------------------------ nodes
 @traced("profile")
 def node_profile(state: State) -> tuple[dict, dict]:
@@ -126,17 +172,7 @@ def node_profile(state: State) -> tuple[dict, dict]:
     profile, ents = build_profile(state["question"], state.get("student_id"))
     base = {"profile": profile, "entities": ents, "role": role, "notes": []}
     # deterministic policy checks: refuse before any model call (0 generation requests)
-    refusal = None
-    if ents.write_intent:
-        refusal = (WRITE_MESSAGE, "write-intent rule")
-    elif ents.contact_request:
-        refusal = (CONTACT_MESSAGE, "privacy rule (contact data)")
-    elif role == "student" and ents.student_id and ents.student_id != state.get("student_id"):
-        refusal = (OWN_RECORDS_MESSAGE, "privacy rule (other student)")
-    elif role == "anonymous" and ents.student_id:
-        refusal = (STAFF_ONLY_MESSAGE, "privacy rule (named student)")
-    elif ents.personal_records and not state.get("student_id") and not ents.student_id:
-        refusal = (LOGIN_MESSAGE, "privacy rule (not logged in)")
+    refusal = policy_refusal(ents, role, state.get("student_id"))
     if refusal:
         return ({**base, "refusal": refusal[0], "refused_by": refusal[1], "route": "refused",
                  "router_stage": "rule"},
@@ -148,6 +184,11 @@ def node_profile(state: State) -> tuple[dict, dict]:
 
 @traced("route")
 def node_route(state: State) -> tuple[dict, dict]:
+    if not FEATURES.semantic_router:        # ablation: the LLM planner routes every question
+        d = RouteDecision(route="hybrid", confidence=0.0, stage="llm", hybrid_hint=False, needs_llm=True,
+                          reason="semantic router disabled (ablation)")
+        return ({"decision": d, "route": d.route, "router_stage": "llm", "needs_understand": True},
+                {"route": None, "ablated": "semantic_router", "reason": d.reason})
     d = semantic_route(state["question"])
     needs = d.needs_llm or d.route == "hybrid"
     return ({"decision": d, "route": d.route, "router_stage": "semantic", "needs_understand": needs},
@@ -175,15 +216,20 @@ def node_retrieve(state: State) -> tuple[dict, dict]:
 @traced("understand")
 def node_understand(state: State) -> tuple[dict, dict]:
     d = state["decision"]
-    hint = f"route '{d.route}' with confidence {d.confidence:.2f}" + (" (hybrid hint)" if d.hybrid_hint else "")
+    hint = (f"route '{d.route}' with confidence {d.confidence:.2f}" + (" (hybrid hint)" if d.hybrid_hint else "")
+            if FEATURES.semantic_router else "none (decide the route yourself)")
     u, pid = understand(state["question"], state["profile"].summary(), hint, state.get("hits", []))
     route = d.route if (not d.needs_llm and d.route == "hybrid") else u.route
     stage = "semantic" if route == d.route and not d.needs_llm else "llm"
     profile = merge_llm_entities(state["profile"], u.entities.model_dump())
     hits = state.get("hits", [])
-    relevant = [hits[i - 1] for i in u.relevant_passages if 0 < i <= len(hits)]
-    for i, h in enumerate(hits, 1):
-        h.relevant = i in u.relevant_passages
+    if FEATURES.relevance_grading:
+        relevant = [hits[i - 1] for i in u.relevant_passages if 0 < i <= len(hits)]
+    else:                                   # ablation: top passages, ungraded
+        relevant = hits[:UNGRADED_TOP_K]
+    chosen = {id(h) for h in relevant}
+    for h in hits:
+        h.relevant = id(h) in chosen
     return ({"understanding": u, "route": route, "router_stage": stage, "profile": profile,
              "relevant_hits": relevant},
             {"prompt": pid, "route": route, "decided_by": stage, "llm_route": u.route,
@@ -194,6 +240,11 @@ def node_understand(state: State) -> tuple[dict, dict]:
 
 @traced("grade_docs")
 def node_grade(state: State) -> tuple[dict, dict]:
+    if not FEATURES.relevance_grading:      # ablation: no grading call, top passages as retrieved
+        top = state.get("hits", [])[:UNGRADED_TOP_K]
+        for h in top:
+            h.relevant = True
+        return ({"relevant_hits": top}, {"ablated": "relevance_grading", "relevant": [h.citation for h in top]})
     relevant, pid = grade_hits(state["question"], state.get("hits", []))
     if not relevant:
         relevant = state.get("hits", [])[:3]
@@ -212,6 +263,13 @@ def node_apply_rules(state: State) -> tuple[dict, dict]:
         return ({"rule_eval": None, "constraints": "", "fallback": True,
                  "notes": ["No rules could be extracted; fell back to parallel retrieval (SQL + documents)."]},
                 {"rules": 0, "fallback": True})
+    if not FEATURES.rule_engine:            # ablation: the SQL step must apply the rules itself
+        text = ("Policy rules extracted from the documents (apply them in the query; they have NOT been "
+                f"checked):\nStudent profile: {state['profile'].summary()}\n"
+                + "\n".join(f"- {r.subject}: {r.field} {r.operator} {r.value} -> {r.effect} {r.citation}"
+                            for r in rules))
+        return ({"rule_eval": None, "constraints": text, "fallback": False},
+                {"rules": len(rules), "ablated": "rule_engine", "constraints": text})
     ev = evaluate_rules(rules, state["profile"])
     text = ev.constraints_text(state["profile"])
     return ({"rule_eval": ev, "constraints": text, "fallback": False},
@@ -242,9 +300,7 @@ def node_query(state: State) -> tuple[dict, dict]:
     executed_at = datetime.now().strftime("%H:%M:%S")      # SQL text may be cached; execution never is
     notes = [] if r.ok else [f"The database step failed ({r.error}); the answer uses policy documents only."]
     if r.privacy_block:
-        msg = {"anonymous": STAFF_ONLY_MESSAGE, "student": OWN_RECORDS_MESSAGE}.get(role, r.privacy_block)
-        if "mail" in r.privacy_block.lower():
-            msg = CONTACT_MESSAGE
+        msg = refusal_for_block(r, role, state["entities"])
         return ({"sql": None, "refusal": msg, "refused_by": "SQL guard (access policy)"},
                 {"mode": mode, "executed_at": executed_at, "blocked": r.privacy_block, "role": role})
     return ({"sql": r, "notes": notes},
@@ -311,6 +367,9 @@ def node_synthesize(state: State) -> tuple[dict, dict]:
         # tell the answer step what the rows ARE (eval SQL06: rows without the filter column were misread
         # as "no information"), and make database-computed totals authoritative (eval H3)
         sql_note = f"These rows are the result of: {r.explanation}\nQuery: {r.sql}"
+        if scoped_to_own_records(state):
+            sql_note += ("\nThe access policy limited these rows to the logged-in student's own records: do not "
+                         "present them as a complete list or as information about other students.")
         totals = database_totals(r.rows)
         if totals:
             sql_note += ("\nDatabase-computed total(s): " + ", ".join(inr(t) for t in totals)
@@ -320,8 +379,11 @@ def node_synthesize(state: State) -> tuple[dict, dict]:
         columns=r.columns if (r and r.ok and not r.unanswerable) else [],
         rows=r.rows if (r and r.ok and not r.unanswerable) else [],
         sql_note=sql_note, rule_summary=rule_summary.strip(), hits=hits)
-    return ({"answer": answer, "citations": cites, "relevant_hits": hits},
-            {"prompt": pid, "citations": cites, "chars": len(answer)})
+    info = {"prompt": pid, "citations": cites, "chars": len(answer)}
+    if scoped_to_own_records(state):                 # stated in code, so it cannot be left out
+        answer = SCOPED_NOTE + "\n\n" + answer
+        info["scoped_note"] = True
+    return ({"answer": answer, "citations": cites, "relevant_hits": hits}, info)
 
 
 @traced("verify")

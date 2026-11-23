@@ -1,0 +1,24 @@
+{
+  "id": "H4",
+  "variant": "no_schema_cards",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "As UniRAG, assistant of Deccan Valley University of Technology (DVUT), here is the answer regarding your course registration:\n\nAdding one more 3-credit elective is **not allowed** at this time, because the add/drop period for the 2026-ODD term ended on **10 August 2026** [Doc: Course Registration & Credit Policy 2026-27 §4]. After the add/drop period, no course can be added [Doc: Course Registration & Credit Policy 2026-27 §4].\n\nHere are the details of your current registration and policy check:\n\n* **Current Credits Registered:** 25 [SQL]\n* **Eligibility Status:** Allowed (based on credit limits alone, as your CGPA is 8.82 ≥ 8.5) [SQL, Doc: Course Registration & Credit Policy 2026-27 §3]\n* **Add/Drop Period Rule:** Courses may be added or dropped only during the add/drop period, which ends 14 days after classes begin (ended on **10 August 2026** for the 2026-ODD term) [Doc: Course Registration & Credit Policy 2026-27 §4].",
+  "facts_found": 2,
+  "facts_total": 3,
+  "missing": [
+    "28"
+  ],
+  "verdict_ok": true,
+  "fully_correct": false,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.student_id, s.full_name, COALESCE(SUM(c.credits), 0) AS current_credits, CASE WHEN COALESCE(SUM(c.credits), 0) + 3 <= 28 THEN 'Allowed' ELSE 'Not Allowed' END AS eligibility_status FROM students AS s LEFT JOIN enrollments AS e ON s.student_id = e.student_id AND e.term = '2026-ODD' AND e.status = 'enrolled' LEFT JOIN courses AS c ON e.course_id = c.course_id WHERE s.student_id = 'S2023ENTC001' GROUP BY s.student_id, s.full_name LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 23325,
+  "wall_s": 23.33
+}

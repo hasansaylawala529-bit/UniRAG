@@ -1,0 +1,22 @@
+{
+  "id": "SQL04",
+  "variant": "no_schema_cards",
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "There are currently 21 fee ledger entries that are overdue across the university [SQL]. A ledger entry is marked as overdue when any balance remains after the due date [Doc: Fee Payment & Refund Policy 2026-27 §3].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "fully_correct": true,
+  "verified_ok": true,
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT COUNT(*) AS overdue_count FROM fee_ledger WHERE status = 'overdue' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 2,
+  "latency_ms": 12125,
+  "wall_s": 12.13
+}
