@@ -1,5 +1,6 @@
 # LLM + embeddings
 google-genai>=1.0
+groq>=1.0                # optional second provider (fallback)
 # Database
 psycopg[binary]>=3.1
 pgvector>=0.3

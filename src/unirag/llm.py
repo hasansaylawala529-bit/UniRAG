@@ -42,10 +42,41 @@ def _is_retryable(exc: BaseException) -> bool:
                                       "ReadError", "TimeoutException", "WriteTimeout", "PoolTimeout"}
 
 
+class ProviderError(Exception):
+    """Uniform error for non-Gemini providers: `code` is the HTTP status (503 for network failures)."""
+
+    def __init__(self, code: int, message: str, fallback: bool = False):
+        super().__init__(f"{code} {message}")
+        self.code, self.fallback = code, fallback
+
+
 def _should_fall_back(exc: BaseException) -> bool:
-    """Worth trying the NEXT model: transient overload, quota exhausted, or model not available to this key."""
+    """Worth trying the NEXT model: transient overload, quota exhausted, model not available to this key,
+    or a provider-specific request problem (e.g. a schema feature one provider does not support)."""
     code = getattr(exc, "code", None)
-    return _is_retryable(exc) or _is_quota_exhausted(exc) or code in (403, 404)
+    return (_is_retryable(exc) or _is_quota_exhausted(exc) or code in (403, 404)
+            or bool(getattr(exc, "fallback", False)))
+
+
+def strict_json_schema(schema: dict) -> dict:
+    """Pydantic schema -> self-contained schema for strict structured output: $refs inlined, titles and
+    defaults removed, every object closed (additionalProperties false) with all properties required."""
+    defs = schema.get("$defs", {})
+
+    def walk(node):
+        if isinstance(node, dict):
+            if "$ref" in node:
+                return walk(defs[node["$ref"].split("/")[-1]])
+            out = {k: walk(v) for k, v in node.items() if k not in ("$defs", "title", "default")}
+            if out.get("type") == "object" and "properties" in out:
+                out["additionalProperties"] = False
+                out["required"] = list(out["properties"])
+            return out
+        if isinstance(node, list):
+            return [walk(v) for v in node]
+        return node
+
+    return walk(schema)
 
 
 def _log_retry(state) -> None:  # tenacity RetryCallState
@@ -77,24 +108,29 @@ _retry_embed = retry(
 class RateLimiter:
     """Spaces requests per model so a free-tier RPM limit is never exceeded (sliding 60 s window)."""
 
-    def __init__(self, rpm_for: dict[str, int], default_rpm: int):
-        self.rpm_for, self.default_rpm = rpm_for, default_rpm
-        self.sent: dict[str, list[float]] = {}
+    def __init__(self, rpm_for: dict[str, int], default_rpm: int, tpm_for: dict[str, int] | None = None):
+        self.rpm_for, self.default_rpm, self.tpm_for = rpm_for, default_rpm, tpm_for or {}
+        self.sent: dict[str, list[tuple[float, int]]] = {}
         self.waited_seconds = 0.0
 
-    def acquire(self, model: str) -> None:
+    def acquire(self, model: str, tokens: int = 0) -> None:
         rpm = max(1, self.rpm_for.get(model, self.default_rpm))
-        now = time.monotonic()
-        window = [t for t in self.sent.get(model, []) if now - t < 60.0]
-        if len(window) >= rpm:
-            wait = 60.0 - (now - window[0]) + 0.2
-            print(f"[llm] {model}: pacing for free-tier limit ({rpm}/min), waiting {wait:.0f}s",
+        tpm = self.tpm_for.get(model)
+        while True:
+            now = time.monotonic()
+            window = [(t, n) for t, n in self.sent.get(model, []) if now - t < 60.0]
+            over_rpm = len(window) >= rpm
+            over_tpm = bool(tpm) and window and sum(n for _, n in window) + tokens > tpm
+            if not (over_rpm or over_tpm):
+                break
+            wait = 60.0 - (now - window[0][0]) + 0.2
+            why = f"{rpm}/min" if over_rpm else f"{tpm} tokens/min"
+            print(f"[llm] {model}: pacing for free-tier limit ({why}), waiting {wait:.0f}s",
                   file=sys.stderr, flush=True)
             time.sleep(wait)
             self.waited_seconds += wait
-            now = time.monotonic()
-            window = [t for t in window if now - t < 60.0]
-        window.append(now)
+            self.sent[model] = window
+        window.append((now, tokens))
         self.sent[model] = window
 
 
@@ -156,59 +192,75 @@ class LLM:
         self.gen_cache = DiskCache(self.s.cache_dir / "gen")
         self.emb_cache = DiskCache(self.s.cache_dir / "emb")
         self.stats = LLMStats()
-        self.limiter = RateLimiter(self.s.model_rpm, self.s.default_rpm)
+        self.limiter = RateLimiter(self.s.model_rpm, self.s.default_rpm, self.s.model_tpm)
+        self.groq = None
+        if self.s.groq_api_key and not self.s.groq_api_key.startswith("your-"):
+            try:
+                from groq import Groq
+
+                self.groq = Groq(api_key=self.s.groq_api_key, max_retries=0, timeout=60.0)
+            except ImportError:
+                print("[llm] GROQ_API_KEY is set but the groq package is missing (pip install groq)",
+                      file=sys.stderr)
         self.last_model_used: str | None = None
         self.last_fallback_errors: list[str] = []
 
     # ------------------------------------------------------------------ generation
     def generate(self, prompt: str, *, system: str | None = None, model: str | None = None,
                  schema: type[T] | None = None, temperature: float = 0.0) -> str | T:
-        """Generate text, or a validated pydantic object when `schema` is given."""
-        from google.genai import types
+        """Generate text, or a validated pydantic object when `schema` is given.
 
+        Tries the requested model, then its fallback chain (other Gemini models, then Groq). A reply that
+        does not validate against the schema counts as a failure of that model and moves on to the next.
+        """
         model = model or self.s.gen_model
         self.stats.gen_requests += 1
         schema_json = schema.model_json_schema() if schema else None
         k = DiskCache.key("gen", model, system, prompt, schema_json, temperature)
-        cached = self.gen_cache.get(k)
         self.last_fallback_errors = []
+        cached = self.gen_cache.get(k)
         if cached is not None:
-            self.stats.cache_hits += 1
-            text = cached["text"]
-            self.last_model_used = cached.get("model", model)
-        else:
-            cfg: dict[str, Any] = {"temperature": temperature}
-            if system:
-                cfg["system_instruction"] = system
-            if schema:
-                cfg["response_mime_type"] = "application/json"
-                cfg["response_json_schema"] = schema_json
-            if self.s.thinking_level:
-                cfg["thinking_config"] = types.ThinkingConfig(thinking_level=self.s.thinking_level)
-            config = types.GenerateContentConfig(**cfg)
-            text, used = None, None
-            t0 = time.perf_counter()
-            for candidate in self._model_chain(model):
-                try:
-                    text, used = self._call_generate(candidate, prompt, config), candidate
-                    break
-                except Exception as e:  # noqa: BLE001 - decide below whether to fall back
-                    if not _should_fall_back(e):
-                        raise
-                    self.last_fallback_errors.append(f"{candidate}: {getattr(e, 'code', '')} {type(e).__name__}")
-                    print(f"[llm] {candidate} unavailable ({getattr(e, 'code', type(e).__name__)}), "
-                          f"trying next model", file=sys.stderr, flush=True)
-            if text is None:
-                raise RuntimeError("All models unavailable: " + "; ".join(self.last_fallback_errors))
-            if used != model:
+            try:
+                out = self._parse(cached["text"], schema)
+                self.stats.cache_hits += 1
+                self.last_model_used = cached.get("model", model)
+                return out
+            except ValueError:
+                pass                                   # an invalid cached reply is regenerated
+        request = {"system": system, "temperature": temperature, "schema": schema_json}
+        t0 = time.perf_counter()
+        for candidate in self._model_chain(model):
+            try:
+                text = self._call_generate(candidate, prompt, request)
+                out = self._parse(text, schema)
+            except ValueError as e:                    # pydantic ValidationError / bad JSON
+                reason = f"{candidate}: invalid JSON for {schema.__name__ if schema else 'text'}"
+                self.last_fallback_errors.append(reason)
+                print(f"[llm] {reason}, trying next model", file=sys.stderr, flush=True)
+                continue
+            except Exception as e:  # noqa: BLE001 - decide whether to fall back
+                if not _should_fall_back(e):
+                    raise
+                self.last_fallback_errors.append(f"{candidate}: {getattr(e, 'code', '')} {type(e).__name__}")
+                print(f"[llm] {candidate} unavailable ({getattr(e, 'code', type(e).__name__)}), "
+                      f"trying next model", file=sys.stderr, flush=True)
+                continue
+            if candidate != model:
                 self.stats.fallbacks += 1
             self.stats.gen_seconds += time.perf_counter() - t0
             self.stats.gen_calls += 1
-            self.stats.by_model[used] = self.stats.by_model.get(used, 0) + 1
-            self.last_model_used = used
-            self.gen_cache.set(k, {"text": text, "model": used})
+            self.stats.by_model[candidate] = self.stats.by_model.get(candidate, 0) + 1
+            self.last_model_used = candidate
+            self.gen_cache.set(k, {"text": text, "model": candidate})
+            return out
+        raise RuntimeError("All models unavailable: " + "; ".join(self.last_fallback_errors))
+
+    @staticmethod
+    def _parse(text: str, schema: type[T] | None) -> str | T:
         if schema:
             return schema.model_validate_json(_strip_fences(text))
+        if not text or not text.strip():
+            raise ValueError("empty reply")
         return text
 
     def _model_chain(self, model: str) -> list[str]:
@@ -219,18 +271,58 @@ class LLM:
         else:
             extra = ()
         chain = [model]
-        for m in extra:
+        for m in list(extra) + list(self.s.groq_fallback_models):
             if m not in chain:
                 chain.append(m)
-        return chain
+        # Groq entries are used only when a Groq key is configured
+        return [m for m in chain if not m.startswith("groq:") or self.groq is not None]
 
     @_retry_gen
-    def _call_generate(self, model: str, prompt: str, config: Any) -> str:
+    def _call_generate(self, model: str, prompt: str, request: dict) -> str:
+        if model.startswith("groq:"):
+            return self._groq_generate(model, prompt, request)
+        return self._gemini_generate(model, prompt, request)
+
+    def _gemini_generate(self, model: str, prompt: str, request: dict) -> str:
+        from google.genai import types
+
+        cfg: dict[str, Any] = {"temperature": request["temperature"]}
+        if request["system"]:
+            cfg["system_instruction"] = request["system"]
+        if request["schema"]:
+            cfg["response_mime_type"] = "application/json"
+            cfg["response_json_schema"] = request["schema"]
+        if self.s.thinking_level:
+            cfg["thinking_config"] = types.ThinkingConfig(thinking_level=self.s.thinking_level)
+        model = model.removeprefix("gemini:")
         self.limiter.acquire(model)
-        resp = self.client.models.generate_content(model=model, contents=prompt, config=config)
+        resp = self.client.models.generate_content(model=model, contents=prompt,
+                                                   config=types.GenerateContentConfig(**cfg))
         if not resp.text:
             raise RuntimeError(f"Empty response from {model}")
         return resp.text
+
+    def _groq_generate(self, model: str, prompt: str, request: dict) -> str:
+        import groq
+
+        messages = ([{"role": "system", "content": request["system"]}] if request["system"] else []) \
+            + [{"role": "user", "content": prompt}]
+        kwargs: dict[str, Any] = {"model": model.removeprefix("groq:"), "messages": messages,
+                                  "temperature": request["temperature"]}
+        if request["schema"]:
+            kwargs["response_format"] = {"type": "json_schema", "json_schema": {
+                "name": "response", "strict": True, "schema": strict_json_schema(request["schema"])}}
+        self.limiter.acquire(model, tokens=len(prompt) // 4 + 1500)   # prompt estimate + reply allowance
+        try:
+            resp = self.groq.chat.completions.create(**kwargs)
+        except groq.APIStatusError as e:
+            raise ProviderError(e.status_code, str(e)[:200], fallback=e.status_code in (400, 413, 422)) from e
+        except (groq.APIConnectionError, groq.APITimeoutError) as e:
+            raise ProviderError(503, f"connection: {e}") from e
+        text = resp.choices[0].message.content if resp.choices else None
+        if not text:
+            raise ProviderError(502, "empty response", fallback=True)
+        return text
 
     # ------------------------------------------------------------------ embeddings
     def embed(self, texts: list[str], task_type: str = "RETRIEVAL_DOCUMENT", batch_size: int = 50) -> list[list[float]]:

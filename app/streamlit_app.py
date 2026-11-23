@@ -94,13 +94,29 @@ def run_question(question: str, student: str | None) -> None:
     st.session_state.selected = len(st.session_state.history) - 1
 
 
+def models_used(r: dict) -> list[str]:
+    """Distinct models that produced this answer (a step may list several, comma-separated)."""
+    found = set()
+    for e in r["trace"]:
+        for m in (e.get("model") or "").split(","):
+            if m.strip():
+                found.add(m.strip())
+    return sorted(found)
+
+
 def footer(r: dict) -> str:
     v = r["verification"]
+    used = models_used(r)
+    provider = ""
+    if used:
+        names = ", ".join(("Groq " + m.removeprefix("groq:")) if m.startswith("groq:") else ("Gemini " + m)
+                          for m in used)
+        provider = f" · {names}"
     figs = len(v.get("figures", []))
     check = ("✅ all figures verified" if v["ok"] and figs else "✅ no figures to check" if v["ok"]
              else f"⚠️ {len([f for f in v['figures'] if not f['verified']])} figure(s) flagged")
     return (f'<div class="footer">{r["route"]} · {r["gen_requests"]} model requests · '
-            f'{r["latency_ms"] / 1000:.1f} s · {check}</div>')
+            f'{r["latency_ms"] / 1000:.1f} s{provider} · {check}</div>')
 
 
 # ------------------------------------------------------------------ state
@@ -162,7 +178,9 @@ with st.sidebar:
     st.divider()
     s = get_settings()
     st.caption(f"{'🟢' if db_ok else '🔴'} Database {'connected' if db_ok else 'not reachable'}  \n"
-               f"Model: `{s.gen_model}` (backups: {', '.join(s.gen_model_fallbacks)})  \n"
+               f"Model: `{s.gen_model}` (backups: {', '.join(s.gen_model_fallbacks)}"
+               + (f"; Groq: {', '.join(m.removeprefix('groq:') for m in s.groq_fallback_models)}" if s.groq_api_key else "")
+               + ")  \n"
                f"Reference date: {s.as_of_date:%d %b %Y}")
     if st.button("Clear chat"):
         st.session_state.history, st.session_state.selected = [], None
@@ -229,9 +247,10 @@ with trace_col:
                 "Step": f"{i}. {STEP_NAMES.get(e['node'], e['node'])}", "Time (ms)": e["ms"],
                 "Model requests": e.get("gen_requests", 0)} for i, e in enumerate(r["trace"], 1)])
             st.dataframe(steps, hide_index=True, width="stretch")
-            models = sorted({e["model"] for e in r["trace"] if e.get("model")})
+            models = models_used(r)
             if models:
-                st.caption("Model used: " + ", ".join(models))
+                st.caption("Model used: " + ", ".join(models)
+                           + ("  ·  ⚠️ fallback provider (Groq) answered" if any(m.startswith("groq:") for m in models) else ""))
             c1, c2, c3 = st.columns(3)
             c1.metric("Model requests", r["gen_requests"])
             c2.metric("Latency", f"{r['latency_ms'] / 1000:.1f} s")

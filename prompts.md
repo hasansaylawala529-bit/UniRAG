@@ -531,6 +531,47 @@ Add a way to prove during the live demo that UniRAG answers from live data, not 
   - **`docs/demo_live_data.md`**: the 6-step before/after script with talking points.
 - **Review:** offline end-to-end — before: tuition ₹45,000 + exam ₹3,500; after paying the exam fee: only ₹45,000, with the same SQL text re-executed and a changed answer; after reset: original rows. Headless UI test: tools hidden when logged out, payment and reset work, and the list refreshes.
 
+### P-017 · Cross-provider fallback (Groq)
+- **Date/time:** 2026-11-23, 18:57 IST
+- **Context:** while testing the live-data demo, every Gemini model returned 503 at once and the UI showed "All Gemini models are busy or out of quota". The error handling worked, but a live demo would have stalled.
+- **Prompt:**
+```text
+It was a server 503 error but a fallback is necessary
+
+I have the groq api key
+
+Phase 7c – Cross-Provider Fallback
+
+During testing, every Gemini model became unavailable at once ("All models unavailable"), which would break a live demo. Add Groq as a second, independent provider for generation.
+
+1. Extend the LLM client so the fallback chain can cross providers: Gemini models first, then Groq (openai/gpt-oss-120b, then openai/gpt-oss-20b), configured in .env (GROQ_API_KEY, provider-prefixed model names in the fallback lists). Embeddings stay on Gemini.
+2. Keep the same interface for the pipeline: structured JSON output validated against the same pydantic schemas, retries, pacing per model (Groq free tier: 30 requests/min, 8K tokens/min), caching, and the model actually used recorded in the trace.
+3. If GROQ_API_KEY is not set, the system behaves exactly as today.
+4. Add tests with mocked providers: Gemini down → Groq answers; invalid JSON from Groq → next model; all providers down → the existing clear error.
+5. Show the provider and model per answer in the UI footer and trace, and update check_models.py to test Groq models too.
+```
+- **Output:**
+  - **`llm.py`** is now provider-neutral. Every chain is: requested Gemini model → Gemini fallbacks → `groq:openai/gpt-oss-120b` → `groq:openai/gpt-oss-20b`. Groq entries are dropped automatically when `GROQ_API_KEY` is empty, so behaviour is unchanged without a key.
+  - **Structured output on Groq** uses strict mode. Groq's strict mode needs closed, self-contained schemas, so `strict_json_schema()` inlines `$ref`s, removes titles and defaults, and sets `additionalProperties: false` with every property required. The reply is still validated against the same pydantic model.
+  - **A reply that fails validation counts as that model failing** and moves on to the next model. Only valid replies are cached; an invalid cached reply is regenerated.
+  - **Groq errors** are mapped to one `ProviderError` with the HTTP status: 429 and 5xx are retried, a daily-quota 429 falls back at once, and 400/413/422 (provider-specific request problems) fall back.
+  - **Rate limiter** also enforces tokens per minute (Groq free tier 8K/min, estimated from prompt length) alongside requests per minute. Built-in limits are merged with `.env` overrides, so an older `.env` without Groq entries still paces Groq correctly.
+  - **UI:** the footer shows the provider and model per answer; the Pipeline tab warns when the Groq fallback answered; the sidebar lists the Groq backups. `check_models.py` also tests the Groq models.
+  - **Settings, dependencies, tests:** `.env.example` has `GROQ_API_KEY` and `GROQ_FALLBACK_MODELS`; `requirements.txt` adds `groq`. New tests with mocked providers:
+    - Gemini down → Groq answers (and every Gemini model is tried first);
+    - the Groq request uses the closed strict schema;
+    - invalid JSON from gpt-oss-120b → gpt-oss-20b answers;
+    - all providers down → the existing clear error;
+    - no key → Gemini-only chain;
+    - token-budget pacing.
+
+    Existing tests now pin `groq_api_key=""` so they never touch the network. 75 tests pass, with or without a Groq key in the environment.
+- **Review:** headless UI test passed and the footer shows the provider and model.
+- **Live check (19:06 IST):**
+  - `check_models.py`: both Groq models OK (1.0 s and 0.6 s). At the same moment every Gemini Flash model returned 503/504, while both Flash-Lite models worked. That is the situation the fallback exists for.
+  - **Forced-fallback test:** `GEN_MODEL=gemini-does-not-exist` → 404 → the next model in the chain answered. In PowerShell, assigning an empty string to `$env:…_FALLBACKS` *deletes* the variable, so the `.env` fallbacks (Gemini Flash-Lite) answered before Groq was reached. That still confirmed the Gemini-internal fallback. The Groq leg is forced next with a non-existent fallback model.
+  - **Bug fixed:** the `check_models.py` suggestion considered only Flash models for `GEN_MODEL` and printed "No generation model worked" although Flash-Lite worked. It now suggests the fastest working Gemini models for both roles.
+
 ## Phase 6 – Demo, presentation & delivery
 
 ---

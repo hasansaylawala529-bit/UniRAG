@@ -17,8 +17,16 @@ def _csv(value: str) -> tuple[str, ...]:
     return tuple(v.strip() for v in value.split(",") if v.strip())
 
 
-def _rpm_map(value: str) -> dict[str, int]:
-    out = {}
+GROQ_MODELS_DEFAULT = "groq:openai/gpt-oss-120b,groq:openai/gpt-oss-20b"
+# Built-in free-tier limits; MODEL_RPM / MODEL_TPM in .env override individual entries.
+RPM_DEFAULTS = {"gemini-3.1-flash-lite": 14, "gemini-3.5-flash-lite": 14, "gemini-3.6-flash": 4,
+                "gemini-3.8-flash": 4, "gemini-embedding-001": 90,
+                "groq:openai/gpt-oss-120b": 28, "groq:openai/gpt-oss-20b": 28}
+TPM_DEFAULTS = {"groq:openai/gpt-oss-120b": 7500, "groq:openai/gpt-oss-20b": 7500}
+
+
+def _rpm_map(value: str, defaults: dict[str, int] | None = None) -> dict[str, int]:
+    out = dict(defaults or {})
     for item in _csv(value):
         if "=" in item:
             k, v = item.split("=", 1)
@@ -40,9 +48,13 @@ class Settings:
     fast_model_fallbacks: tuple[str, ...] = field(default_factory=lambda: _csv(
         os.getenv("FAST_MODEL_FALLBACKS", "gemini-3.5-flash-lite")))
     # Requests-per-minute budget per model; calls are spaced to stay under it (free-tier friendly).
-    model_rpm: dict[str, int] = field(default_factory=lambda: _rpm_map(os.getenv(
-        "MODEL_RPM", "gemini-3.1-flash-lite=14,gemini-3.5-flash-lite=14,gemini-3.6-flash=4,"
-                     "gemini-3.8-flash=4,gemini-embedding-001=90")))
+    model_rpm: dict[str, int] = field(default_factory=lambda: _rpm_map(os.getenv("MODEL_RPM", ""), RPM_DEFAULTS))
+    # tokens per minute (estimated from prompt length); needed for Groq's 8K TPM free tier
+    model_tpm: dict[str, int] = field(default_factory=lambda: _rpm_map(os.getenv("MODEL_TPM", ""), TPM_DEFAULTS))
+    # Second provider: used only after every Gemini model in a chain has failed. Empty key = disabled.
+    groq_api_key: str = field(default_factory=lambda: os.getenv("GROQ_API_KEY", ""))
+    groq_fallback_models: tuple[str, ...] = field(default_factory=lambda: _csv(
+        os.getenv("GROQ_FALLBACK_MODELS", GROQ_MODELS_DEFAULT)))
     default_rpm: int = field(default_factory=lambda: int(os.getenv("DEFAULT_RPM", "4")))
     thinking_level: str = field(default_factory=lambda: os.getenv("THINKING_LEVEL", ""))  # optional, e.g. "low"
 

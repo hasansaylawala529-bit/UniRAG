@@ -240,4 +240,6 @@ Order of what to cut if behind schedule: MCP → HyDE → verifier regeneration 
 - Calls are paced per model to stay under the per-minute limit.
 - Every response is cached on disk, so evaluation reruns are free.
 
+**Second provider (P-017):** when every Gemini model in a chain fails, generation falls back to Groq (`gpt-oss-120b`, then `gpt-oss-20b`) with strict JSON-schema output, validated against the same pydantic models. Embeddings stay on Gemini.
+
 All model IDs and limits live in `.env` (`GEN_MODEL`, `FAST_MODEL`, `*_FALLBACKS`, `MODEL_RPM`). Moving to a paid tier needs no code change.

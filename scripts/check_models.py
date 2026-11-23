@@ -61,15 +61,31 @@ def main() -> None:
     except Exception as e:  # noqa: BLE001
         print(f"{s.embed_model:<26}{str(getattr(e, 'code', '?')):<8}{time.perf_counter() - t0:>8.1f}  {short(e)}")
 
-    print("\nSuggested .env (fastest working models first):")
-    gen = [m for _, m in sorted(ok_gen)]
-    fast = [m for _, m in sorted(ok_fast)]
-    if gen:
-        print(f"GEN_MODEL={gen[0]}\nGEN_MODEL_FALLBACKS={','.join(gen[1:])}")
+    if s.groq_api_key and not s.groq_api_key.startswith("your-"):
+        try:
+            from groq import Groq
+            gclient = Groq(api_key=s.groq_api_key, max_retries=0, timeout=30.0)
+            for m in s.groq_fallback_models:
+                t0 = time.perf_counter()
+                try:
+                    r = gclient.chat.completions.create(model=m.removeprefix("groq:"), temperature=0, messages=[
+                        {"role": "user", "content": "Reply with the single word: OK"}])
+                    print(f"{m:<26}{'OK':<8}{time.perf_counter() - t0:>8.1f}  {(r.choices[0].message.content or '').strip()[:30]}")
+                except Exception as e:  # noqa: BLE001
+                    print(f"{m:<26}{str(getattr(e, 'status_code', '?')):<8}{time.perf_counter() - t0:>8.1f}  {short(e)}")
+        except ImportError:
+            print("groq package not installed: pip install groq")
     else:
-        print("# No generation model worked - check the key, quota and model access in AI Studio")
-    if fast:
-        print(f"FAST_MODEL={fast[0]}\nFAST_MODEL_FALLBACKS={','.join(fast[1:])}")
+        print("(GROQ_API_KEY not set: Groq fallback disabled)")
+
+    print("\nSuggested .env (fastest working models first):")
+    # any working Gemini text model can serve either role; fastest first
+    working = [m for _, m in sorted(ok_gen + ok_fast)]
+    if working:
+        print(f"GEN_MODEL={working[0]}\nGEN_MODEL_FALLBACKS={','.join(working[1:])}")
+        print(f"FAST_MODEL={working[0]}\nFAST_MODEL_FALLBACKS={','.join(working[1:])}")
+    else:
+        print("# No Gemini generation model worked right now - the Groq fallback (if configured) will answer")
     print("\nYour limits per model: https://aistudio.google.com/rate-limit")
 
 
