@@ -17,7 +17,7 @@ import operator
 import re
 import time
 from dataclasses import asdict, dataclass, field
-from datetime import date
+from datetime import date, datetime
 from functools import lru_cache
 from typing import Annotated, Any, Callable, TypedDict
 
@@ -197,6 +197,7 @@ def node_query(state: State) -> tuple[dict, dict]:
         r, mode = compiled_grant_query(eligible), "compiled_from_rules"
     else:
         r, mode = answer_sql(question, student_id=scope, extra_context=context), "text_to_sql"
+    executed_at = datetime.now().strftime("%H:%M:%S")      # SQL text may be cached; execution never is
     notes = [] if r.ok else [f"The database step failed ({r.error}); the answer uses policy documents only."]
     # Privacy: "my ..." questions with nobody logged in and no student named must not return other
     # students' rows from personal tables (the SQL could not be scoped to anyone).
@@ -208,7 +209,7 @@ def node_query(state: State) -> tuple[dict, dict]:
             {"prompt": ",".join(r.prompt_ids), "sql_question": question, "sql": r.sql, "ok": r.ok,
              "rows": len(r.rows), "attempts": len(r.attempts), "scoped_to": scope,
              "guard": r.attempts[-1].guard_notes if r.attempts else [], "model": ",".join(r.models_used),
-             "mode": mode})
+             "mode": mode, "executed_at": executed_at})
 
 
 @traced("synthesize")

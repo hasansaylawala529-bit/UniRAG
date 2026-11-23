@@ -498,6 +498,39 @@ Latency median / p90: SQL 26.5 / 97.6 s · Documents 18.1 / 59.1 s · Hybrid 72.
   2. **Latency on the free tier:** median 18–73 s, mostly transient 503 retries. Planned mitigations: a cross-provider fallback (Groq) and a paid tier in production.
   3. **The verifier proves provenance, not reasoning.** Figures are checked against the evidence and totals against the database, but a wrong conclusion built from correct figures can still pass. That is why answers show their working and every claim is cited.
 
+### P-016 · Live data freshness demo
+- **Date/time:** 2026-11-23, 18:40 IST
+- **Goal:** Turn the design claim "live data is queried, never embedded" into something the panel can watch: change a fee in the database, ask again, see the new answer.
+- **Prompt:**
+```text
+Phase 7a – Live Data Freshness Demo
+
+Add a way to prove during the live demo that UniRAG answers from live data, not from embedded snapshots.
+
+1. In the Streamlit sidebar, add a collapsible "Demo tools (admin)" section, visible only when a student is logged in. It lists the student's unpaid fee items and offers "Record payment" for one item, plus a "Reset demo data" button that restores the original seeded values.
+2. Writes must go through a small, separate admin module using the admin database connection, completely outside the question-answering path: the assistant itself must stay read-only, and nothing an LLM generates may ever write to the database. Every write is limited to one fee_ledger row of the logged-in student and recomputes that row's status.
+3. After a payment, re-asking "What are my overdue fees?" must reflect the change immediately. Make sure no cache can serve the stale answer, and show in the trace that the SQL ran live.
+4. Add tests: payment updates only the targeted row, status is recomputed correctly, reset restores the seed values exactly, and the read-only role still cannot write.
+5. Write a short before/after demo script (question → pay → same question) for the presentation.
+```
+- **Output:**
+  - **`src/unirag/admin.py`**: the only runtime writer. It uses the admin connection and is called only by a UI button.
+    - `record_payment` locks and updates exactly one row of the logged-in student, recomputes the status with the generator's rule, and rolls back unless exactly one row changed.
+    - `reset_demo_data` restores `fee_ledger` from the seed CSV in one transaction.
+  - **Freshness by design:** SQL *text* may come from the cache, but it is always executed live, and the answer step sees the new rows, so the cached answer cannot be reused. The trace records `executed_at`, and the SQL tab shows "Executed live against PostgreSQL at hh:mm:ss".
+  - **UI:** a "Demo tools (admin)" expander, shown only when a student is logged in, with the unpaid items in ₹ Indian format, Record payment and Reset demo data.
+  - **Tests (`tests/test_admin.py`):**
+    - no pipeline module imports `admin` (static check);
+    - the status rule;
+    - payment changes only the target row;
+    - cannot pay another student's item;
+    - reset restores the seed exactly;
+    - the read-only role cannot UPDATE.
+
+    Database tests skip when PostgreSQL is down and restore the seed afterwards. 69 tests pass.
+  - **`docs/demo_live_data.md`**: the 6-step before/after script with talking points.
+- **Review:** offline end-to-end — before: tuition ₹45,000 + exam ₹3,500; after paying the exam fee: only ₹45,000, with the same SQL text re-executed and a changed answer; after reset: original rows. Headless UI test: tools hidden when logged out, payment and reset work, and the list refreshes.
+
 ## Phase 6 – Demo, presentation & delivery
 
 ---

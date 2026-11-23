@@ -47,7 +47,9 @@ streamlit run app/streamlit_app.py         # opens http://localhost:8501
 ```
 Chat on the left; on the right, "How it was answered" shows the route, pipeline steps, rule checks,
 the SQL (compiled in code or LLM-generated + guarded), the policy passages and the figure verification.
-Choose a student under "Logged in as" to ask about "my" fees or attendance.
+Choose a student under "Logged in as" to ask about "my" fees or attendance. With a student selected,
+**Demo tools (admin)** can record a fee payment and reset the data, to show that answers change immediately
+because values are queried live, never embedded (script: `docs/demo_live_data.md`).
 
 ## Evaluation
 ```bash

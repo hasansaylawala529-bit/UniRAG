@@ -18,6 +18,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from unirag.config import get_settings  # noqa: E402
+from unirag.synthesis.formatting import inr  # noqa: E402
 from unirag.examples import (DEMO_STUDENTS, DOCS_EXAMPLES, OUT_OF_SCOPE_EXAMPLES,  # noqa: E402
                              SQL_EXAMPLES, hybrid_examples)
 
@@ -120,6 +121,33 @@ with st.sidebar:
     choice = st.selectbox("Logged in as", options, format_func=lambda o: labels.get(o, o),
                           help="Questions about 'my' fees or attendance only show this student's rows.")
     student = None if choice == "(not logged in)" else choice
+
+    if student:
+        with st.expander("🛠️ Demo tools (admin)", expanded=False):
+            st.caption("Proves answers come from live data: record a payment, then ask the same question "
+                       "again. This is a separate admin action; the assistant itself is read-only.")
+            from unirag import admin
+
+            try:
+                items = admin.unpaid_items(student)
+            except Exception:  # noqa: BLE001
+                items = []
+            if items:
+                pick = st.selectbox("Unpaid fee item", items, key="pay-item",
+                                    format_func=lambda i: f"{i.component} · {inr(i.balance)} · due {i.due_date} · {i.status}")
+                if st.button("Record payment", width="stretch"):
+                    paid = admin.record_payment(student, pick.txn_id)
+                    st.session_state.admin_msg = (f"Recorded full payment of {paid.component} for {student} "
+                                                  f"(status now {paid.status}). Ask your question again.")
+                    st.rerun()
+            else:
+                st.caption("No unpaid fee items for this student.")
+            if st.button("Reset demo data", width="stretch"):
+                n = admin.reset_demo_data()
+                st.session_state.admin_msg = f"Fee ledger restored to the seeded data ({n} rows)."
+                st.rerun()
+            if st.session_state.get("admin_msg"):
+                st.success(st.session_state.pop("admin_msg"))
 
     st.subheader("Try an example")
     groups = [("🗄️ Database", SQL_EXAMPLES), ("📄 Policy documents", DOCS_EXAMPLES),
@@ -243,6 +271,9 @@ with trace_col:
                     st.info(f"LLM-generated, then validated by the SQL guard and run as a read-only role "
                             f"(attempts: {q_ev.get('attempts', 1) if q_ev else 1}).")
                 st.code(r["sql"], language="sql")
+                if q_ev and q_ev.get("executed_at"):
+                    st.caption(f"⏱ Executed live against PostgreSQL at {q_ev['executed_at']} · "
+                               f"{len(r['sql_rows'])} row(s). Answers are never served from embedded copies of data.")
                 if q_ev and q_ev.get("guard"):
                     st.caption("Guard: " + "; ".join(q_ev["guard"]))
                 if r["sql_rows"]:
