@@ -1,0 +1,76 @@
+course_id,course_code,title,dept_id,semester,credits,course_type,capacity,instructor
+101,CS101,Engineering Mathematics I,1,1,4,core,30,Prof. S. Karve
+102,CS102,Engineering Physics,1,1,4,core,30,Prof. J. Kamble
+103,CS103,Programming in C,1,1,3,core,30,Prof. N. Damle
+104,CS104,Basic Electrical Engineering,1,1,3,core,30,Prof. V. Limaye
+105,CS105,Programming Lab I,1,1,2,lab,30,Prof. N. Damle
+106,CS201,Data Structures,1,3,4,core,30,Prof. K. Oak
+107,CS202,Discrete Mathematics,1,3,4,core,30,Prof. R. Bapat
+108,CS203,Computer Organization,1,3,3,core,30,Prof. V. Limaye
+109,CS204,Object Oriented Programming,1,3,3,core,30,Prof. A. Phadke
+110,CS205,Data Structures Lab,1,3,2,lab,30,Prof. L. Waghmare
+111,CS301,Database Management Systems,1,5,4,core,30,Prof. G. Ketkar
+112,CS302,Theory of Computation,1,5,4,core,30,Prof. R. Bapat
+113,CS303,Computer Networks,1,5,3,core,30,Prof. V. Limaye
+114,CS304,Software Engineering,1,5,3,core,30,Prof. A. Phadke
+115,CS305,DBMS Lab,1,5,2,lab,30,Prof. A. Phadke
+116,CS3E1,Machine Learning,1,5,3,dept_elective,15,Prof. G. Ketkar
+117,CS3E2,Cloud Computing,1,5,3,dept_elective,15,Prof. V. Limaye
+118,CS401,Distributed Systems,1,7,4,core,30,Prof. L. Waghmare
+119,CS402,Compiler Design,1,7,4,core,30,Prof. R. Bapat
+120,CS403,Information Security,1,7,3,core,30,Prof. H. Mane
+121,CS404,Project Phase I,1,7,3,core,30,Prof. J. Kamble
+122,CS405,Project Lab,1,7,2,lab,30,Prof. T. Salunkhe
+123,CS4E1,Natural Language Processing,1,7,3,dept_elective,15,Prof. P. Sathe
+124,CS4E2,Blockchain Technology,1,7,3,dept_elective,15,Prof. S. Karve
+125,IT101,Engineering Mathematics I,2,1,4,core,28,Prof. J. Kamble
+126,IT102,Engineering Physics,2,1,4,core,28,Prof. A. Phadke
+127,IT103,Programming in C,2,1,3,core,28,Prof. D. Bhide
+128,IT104,Basic Electrical Engineering,2,1,3,core,28,Prof. V. Limaye
+129,IT105,Programming Lab I,2,1,2,lab,28,Prof. P. Sathe
+130,IT201,Data Structures & Algorithms,2,3,4,core,28,Prof. P. Sathe
+131,IT202,Digital Logic Design,2,3,4,core,28,Prof. P. Sathe
+132,IT203,Computer Graphics,2,3,3,core,28,Prof. K. Oak
+133,IT204,Java Programming,2,3,3,core,28,Prof. R. Bapat
+134,IT205,DSA Lab,2,3,2,lab,28,Prof. A. Phadke
+135,IT301,Operating Systems,2,5,4,core,28,Prof. V. Limaye
+136,IT302,Web Technologies,2,5,4,core,28,Prof. J. Kamble
+137,IT303,Design & Analysis of Algorithms,2,5,3,core,28,Prof. P. Sathe
+138,IT304,Human Computer Interaction,2,5,3,core,28,Prof. S. Karve
+139,IT305,Web Technologies Lab,2,5,2,lab,28,Prof. J. Kamble
+140,IT3E1,Data Science,2,5,3,dept_elective,15,Prof. S. Karve
+141,IT3E2,Internet of Things,2,5,3,dept_elective,15,Prof. M. Tilak
+142,IT401,Cyber Security,2,7,4,core,28,Prof. P. Sathe
+143,IT402,Big Data Analytics,2,7,4,core,28,Prof. S. Karve
+144,IT403,Mobile Computing,2,7,3,core,28,Prof. D. Bhide
+145,IT404,Project Phase I,2,7,3,core,28,Prof. H. Mane
+146,IT405,Project Lab,2,7,2,lab,28,Prof. H. Mane
+147,IT4E1,Deep Learning,2,7,3,dept_elective,15,Prof. A. Phadke
+148,IT4E2,DevOps Engineering,2,7,3,dept_elective,15,Prof. R. Bapat
+149,ENTC101,Engineering Mathematics I,3,1,4,core,28,Prof. R. Bapat
+150,ENTC102,Engineering Physics,3,1,4,core,28,Prof. T. Salunkhe
+151,ENTC103,Programming in C,3,1,3,core,28,Prof. D. Bhide
+152,ENTC104,Basic Electrical Engineering,3,1,3,core,28,Prof. V. Limaye
+153,ENTC105,Programming Lab I,3,1,2,lab,28,Prof. S. Karve
+154,ENTC201,Electronic Devices & Circuits,3,3,4,core,28,Prof. N. Damle
+155,ENTC202,Signals & Systems,3,3,4,core,28,Prof. S. Karve
+156,ENTC203,Digital Electronics,3,3,3,core,28,Prof. G. Ketkar
+157,ENTC204,Network Theory,3,3,3,core,28,Prof. T. Salunkhe
+158,ENTC205,EDC Lab,3,3,2,lab,28,Prof. M. Tilak
+159,ENTC301,Digital Communication,3,5,4,core,28,Prof. D. Bhide
+160,ENTC302,Microcontrollers,3,5,4,core,28,Prof. D. Bhide
+161,ENTC303,Control Systems,3,5,3,core,28,Prof. T. Salunkhe
+162,ENTC304,Electromagnetics,3,5,3,core,28,Prof. D. Bhide
+163,ENTC305,Microcontroller Lab,3,5,2,lab,28,Prof. N. Damle
+164,ENTC3E1,VLSI Design,3,5,3,dept_elective,15,Prof. T. Salunkhe
+165,ENTC3E2,Embedded Systems,3,5,3,dept_elective,15,Prof. G. Ketkar
+166,ENTC401,Wireless Communication,3,7,4,core,28,Prof. M. Tilak
+167,ENTC402,Digital Signal Processing,3,7,4,core,28,Prof. P. Sathe
+168,ENTC403,Antenna & Wave Propagation,3,7,3,core,28,Prof. B. Thorat
+169,ENTC404,Project Phase I,3,7,3,core,28,Prof. P. Sathe
+170,ENTC405,DSP Lab,3,7,2,lab,28,Prof. V. Limaye
+171,ENTC4E1,Robotics,3,7,3,dept_elective,15,Prof. J. Kamble
+172,ENTC4E2,Computer Vision,3,7,3,dept_elective,15,Prof. D. Bhide
+173,OE301,Entrepreneurship & Innovation,2,5,3,open_elective,40,Prof. M. Tilak
+174,OE302,Financial Literacy for Engineers,1,5,3,open_elective,40,Prof. V. Limaye
+175,OE401,Technical Writing & Communication,3,7,3,open_elective,40,Prof. D. Bhide

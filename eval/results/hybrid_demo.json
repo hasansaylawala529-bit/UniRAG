@@ -1,0 +1,306 @@
+[
+  {
+    "id": "H1",
+    "route": "hybrid",
+    "stage": "semantic",
+    "gen_requests": 2,
+    "api_calls": 1,
+    "latency_ms": 4081,
+    "facts_found": 16,
+    "facts_total": 18,
+    "missing": [
+      "15 Mar 2027",
+      "31 Mar 2027"
+    ],
+    "verification_ok": true,
+    "verification": "All 16 figures verified against the evidence.",
+    "answer": "As a third-year Computer Science student with a 9.5 CGPA, you are eligible for several research grants. Please note that per policy, you must apply only while the status is **open** [Doc: Research Grant Policy 2026-27 §2].\n\n### Currently Open Grants\nYou may apply for the following grants immediately:\n\n| Grant Title | Grant Code | Amount | Deadline |\n| :--- | :--- | :--- | :--- |\n| AI for Social Good Research Fellowship | GR-AI-01 | ₹1,50,000 | 20 Dec 2026 |\n| Undergraduate Machine Learning Research Assistantship | GR-ML-02 | ₹60,000 | 10 Jan 2027 |\n| Cybersecurity Research Scholarship | GR-CY-03 | ₹75,000 | 31 Jan 2027 |\n| Sustainability & Green Computing Grant | GR-SUS-08 | ₹70,000 | 28 Feb 2027 |\n\n*   **Eligibility Notes:** Your CGPA of 9.5 meets the minimum requirements for all the above (e.g., GR-AI-01 requires ≥ 8.5 [Doc: Research Grant Policy 2026-27 §3]; GR-ML-02 requires ≥ 9.0 [Doc: Research Grant Policy 2026-27 §3]). For **GR-CY-03**, you must have no overdue fee dues on the date of application [Doc: Research Grant Policy 2026-27 §3].\n\n### Upcoming and Closed Grants\n*   **Upcoming:** HealthTech Innovation Grant (GR-HC-10, ₹90,000) opens 05 Jan 2027; Summer Research Internship Stipend (GR-SP-14, ₹40,000) opens 01 Dec 2026.\n*   **Closed:** Hardware Hackathon Seed Fund (GR-HW-06) and Autonomous Robotics Research Grant (GR-ROB-12) are closed and no longer accepting applications [Doc: Research Grant Policy 2026-27 §2].",
+    "sql": "SELECT grant_code, title, amount, application_open, application_deadline, status FROM grants WHERE grant_code = ANY(ARRAY['GR-AI-01', 'GR-CY-03', 'GR-ML-02', 'GR-SUS-08', 'GR-ROB-12', 'GR-SP-14', 'GR-HC-10', 'GR-HW-06']) ORDER BY application_deadline",
+    "sql_columns": [
+      "grant_code",
+      "title",
+      "amount",
+      "application_open",
+      "application_deadline",
+      "status"
+    ],
+    "sql_rows": [
+      {
+        "grant_code": "GR-HW-06",
+        "title": "Hardware Hackathon Seed Fund",
+        "amount": 30000,
+        "application_open": "2026-10-01",
+        "application_deadline": "2026-12-15",
+        "status": "closed"
+      },
+      {
+        "grant_code": "GR-AI-01",
+        "title": "AI for Social Good Research Fellowship",
+        "amount": 150000,
+        "application_open": "2026-11-01",
+        "application_deadline": "2026-12-20",
+        "status": "open"
+      },
+      {
+        "grant_code": "GR-ROB-12",
+        "title": "Autonomous Robotics Research Grant",
+        "amount": 85000,
+        "application_open": "2026-10-15",
+        "application_deadline": "2026-12-31",
+        "status": "closed"
+      },
+      {
+        "grant_code": "GR-ML-02",
+        "title": "Undergraduate Machine Learning Research Assistantship",
+        "amount": 60000,
+        "application_open": "2026-11-10",
+        "application_deadline": "2027-01-10",
+        "status": "open"
+      },
+      {
+        "grant_code": "GR-CY-03",
+        "title": "Cybersecurity Research Scholarship",
+        "amount": 75000,
+        "application_open": "2026-11-15",
+        "application_deadline": "2027-01-31",
+        "status": "open"
+      },
+      {
+        "grant_code": "GR-SUS-08",
+        "title": "Sustainability & Green Computing Grant",
+        "amount": 70000,
+        "application_open": "2026-11-01",
+        "application_deadline": "2027-02-28",
+        "status": "open"
+      },
+      {
+        "grant_code": "GR-HC-10",
+        "title": "HealthTech Innovation Grant",
+        "amount": 90000,
+        "application_open": "2027-01-05",
+        "application_deadline": "2027-03-15",
+        "status": "upcoming"
+      },
+      {
+        "grant_code": "GR-SP-14",
+        "title": "Summer Research Internship Stipend",
+        "amount": 40000,
+        "application_open": "2026-12-01",
+        "application_deadline": "2027-03-31",
+        "status": "upcoming"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "id": "H2",
+    "route": "hybrid",
+    "stage": "semantic",
+    "gen_requests": 3,
+    "api_calls": 1,
+    "latency_ms": 11658,
+    "facts_found": 2,
+    "facts_total": 3,
+    "missing": [
+      "₹500"
+    ],
+    "verification_ok": true,
+    "verification": "All 12 figures verified against the evidence.",
+    "answer": "Krishna Kale (S2026CS003), you are eligible to receive the hall ticket for all your end-semester exams.\n\nAccording to the Examination & Attendance Rules 2026-27, a hall ticket is issued if the examination fee is fully paid and the student meets the minimum attendance requirement of 75% in each course [Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets].\n\nYour status for each course is as follows:\n\n| Course Code | Title | Attendance | Fee Status | Eligibility |\n| :--- | :--- | :--- | :--- | :--- |\n| CS101 | Engineering Mathematics I | 79.6% | paid | Eligible |\n| CS102 | Engineering Physics | 73.5% | paid | **Ineligible** |\n| CS103 | Programming in C | 85.6% | paid | Eligible |\n| CS104 | Basic Electrical Engineering | 77.2% | paid | Eligible |\n| CS105 | Programming Lab I | 77.8% | paid | Eligible |\n\n**Supporting Details:**\n*   **Fees:** Your examination fee status is \"paid\" for all courses [SQL].\n*   **Attendance:** You meet the 75% minimum attendance requirement [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance] for all courses except **CS102 Engineering Physics**, where your attendance is 73.5% [SQL]. \n*   **Detention:** As your attendance in CS102 is above 65%, you are not detained [Doc: Examination & Attendance Rules 2026-27 §4 Detention], but you do not meet the 75% threshold required to take the exam [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance]. Please note that attendance between 65% and 75% may be eligible for condonation, though the evidence does not confirm if you have an approved condonation [Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets].",
+    "sql": "SELECT c.course_code, c.title, e.attendance_pct, f.component, (f.amount_due - f.amount_paid) AS outstanding_balance, f.status AS fee_status FROM enrollments AS e JOIN courses AS c ON e.course_id = c.course_id LEFT JOIN fee_ledger AS f ON e.student_id = f.student_id AND f.component = 'exam' WHERE e.student_id = 'S2026CS003' AND e.term = '2026-ODD' LIMIT 200",
+    "sql_columns": [
+      "course_code",
+      "title",
+      "attendance_pct",
+      "component",
+      "outstanding_balance",
+      "fee_status"
+    ],
+    "sql_rows": [
+      {
+        "course_code": "CS101",
+        "title": "Engineering Mathematics I",
+        "attendance_pct": 79.6,
+        "component": "exam",
+        "outstanding_balance": 0,
+        "fee_status": "paid"
+      },
+      {
+        "course_code": "CS102",
+        "title": "Engineering Physics",
+        "attendance_pct": 73.5,
+        "component": "exam",
+        "outstanding_balance": 0,
+        "fee_status": "paid"
+      },
+      {
+        "course_code": "CS103",
+        "title": "Programming in C",
+        "attendance_pct": 85.6,
+        "component": "exam",
+        "outstanding_balance": 0,
+        "fee_status": "paid"
+      },
+      {
+        "course_code": "CS104",
+        "title": "Basic Electrical Engineering",
+        "attendance_pct": 77.2,
+        "component": "exam",
+        "outstanding_balance": 0,
+        "fee_status": "paid"
+      },
+      {
+        "course_code": "CS105",
+        "title": "Programming Lab I",
+        "attendance_pct": 77.8,
+        "component": "exam",
+        "outstanding_balance": 0,
+        "fee_status": "paid"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "id": "H3",
+    "route": "hybrid",
+    "stage": "llm",
+    "gen_requests": 3,
+    "api_calls": 1,
+    "latency_ms": 29775,
+    "facts_found": 3,
+    "facts_total": 3,
+    "missing": [],
+    "verification_ok": true,
+    "verification": "All 11 figures verified against the evidence.",
+    "answer": "As of 30 November 2026, you have accumulated a total late fine of ₹11,000 on your overdue fees.\n\nThe total is calculated by summing the late fines for your individual fee components:\n\n| Component | Late Fine |\n| :--- | :--- |\n| tuition_inst1 | ₹5,500 |\n| exam | ₹5,500 |\n| **Total** | **₹11,000** |\n\n**Supporting Details:**\n* **tuition_inst1:** The database lists a total late fine of ₹5,500 [SQL]. Per policy, late fines for tuition are capped at ₹5,000 per component [Doc: Fee Payment & Refund Policy 2026-27 §4]. Please note that the database value of ₹5,500 exceeds this cap.\n* **exam:** A flat late fine of ₹500 is charged for examination fees [Doc: Fee Payment & Refund Policy 2026-27 §4]. The database lists a total late fine of ₹5,500 [SQL].\n\nLate fines are charged on top of the outstanding balance and must be paid before the component is considered cleared [Doc: Fee Payment & Refund Policy 2026-27 §4]. You may apply for a waiver through the Accounts Office only in cases of documented medical emergencies or bereavement within 30 days [Doc: Fee Payment & Refund Policy 2026-27 §4].",
+    "sql": "WITH overdue_fees AS (SELECT component, amount_due, amount_paid, due_date, (CAST('2026-11-30' AS DATE) - due_date) AS days_overdue FROM fee_ledger WHERE student_id = 'S2026CS012' AND status = 'overdue'), fine_calculations AS (SELECT component, amount_due, amount_paid, due_date, days_overdue, CASE WHEN component = 'exam' THEN 500 ELSE LEAST(days_overdue * 100, 5000) END AS late_fine FROM overdue_fees) SELECT component, amount_due, amount_paid, due_date, days_overdue, late_fine, SUM(late_fine) OVER () AS total_late_fine FROM fine_calculations LIMIT 200",
+    "sql_columns": [
+      "component",
+      "amount_due",
+      "amount_paid",
+      "due_date",
+      "days_overdue",
+      "late_fine",
+      "total_late_fine"
+    ],
+    "sql_rows": [
+      {
+        "component": "tuition_inst1",
+        "amount_due": 90000,
+        "amount_paid": 45000,
+        "due_date": "2026-08-14",
+        "days_overdue": 108,
+        "late_fine": 5000,
+        "total_late_fine": 5500
+      },
+      {
+        "component": "exam",
+        "amount_due": 3500,
+        "amount_paid": 0,
+        "due_date": "2026-10-31",
+        "days_overdue": 30,
+        "late_fine": 500,
+        "total_late_fine": 5500
+      }
+    ],
+    "notes": []
+  },
+  {
+    "id": "H4",
+    "route": "hybrid",
+    "stage": "llm",
+    "gen_requests": 3,
+    "api_calls": 1,
+    "latency_ms": 2419,
+    "facts_found": 3,
+    "facts_total": 3,
+    "missing": [],
+    "verification_ok": true,
+    "verification": "All 9 figures verified against the evidence.",
+    "answer": "No, you are not allowed to add another 3-credit elective this term.\n\nWhile you meet the credit limit requirements, the add/drop period has already closed.\n\n*   **Credit Limit:** You are eligible for a credit overload of up to 28 credits because your CGPA of 8.82 is ≥ 8.5 [Doc: Course Registration & Credit Policy 2026-27 §3]. With your current 25 credits [SQL], adding 3 credits would bring you to 28, which is within the allowed limit.\n*   **Add/Drop Period:** Courses can only be added during the add/drop period, which ended on 10 August 2026 [Doc: Course Registration & Credit Policy 2026-27 §4]. After this period, no course can be added [Doc: Course Registration & Credit Policy 2026-27 §4].\n\n| Metric | Value |\n| :--- | :--- |\n| Current Credits | 25 [SQL] |\n| CGPA | 8.82 [SQL] |\n| Add/Drop Status | 10 August 2026 (Closed) [Doc: Course Registration & Credit Policy 2026-27 §4] |",
+    "sql": "SELECT SUM(c.credits) AS total_registered_credits, CASE WHEN CAST('2026-11-23' AS DATE) BETWEEN CAST('2026-07-31' AS DATE) AND CAST('2027-01-15' AS DATE) THEN 'Within add/drop period' ELSE 'Outside add/drop period' END AS add_drop_status FROM enrollments AS e JOIN courses AS c ON e.course_id = c.course_id WHERE e.student_id = 'S2023ENTC001' AND e.term = '2026-ODD' AND e.status = 'enrolled' LIMIT 200",
+    "sql_columns": [
+      "total_registered_credits",
+      "add_drop_status"
+    ],
+    "sql_rows": [
+      {
+        "total_registered_credits": 25,
+        "add_drop_status": "Within add/drop period"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "id": "H5",
+    "route": "hybrid",
+    "stage": "semantic",
+    "gen_requests": 3,
+    "api_calls": 1,
+    "latency_ms": 2302,
+    "facts_found": 3,
+    "facts_total": 3,
+    "missing": [],
+    "verification_ok": true,
+    "verification": "All 11 figures verified against the evidence.",
+    "answer": "Yes, you are eligible for a merit fee concession. Based on your CGPA of 8.6, you qualify for a 15% concession on your annual tuition fee [Doc: Scholarship & Fee Concession Policy 2026-27 §2].\n\n**Calculation:**\n*   **Annual Tuition Fee:** ₹1,45,000 [SQL]\n*   **Concession Percentage:** 15% (for CGPA 8.50 – 8.99) [Doc: Scholarship & Fee Concession Policy 2026-27 §2]\n*   **Total Concession Amount:** 15% × ₹1,45,000 = ₹21,750\n\n**Eligibility Details:**\n*   **CGPA:** Your CGPA of 8.6 meets the requirement of 8.50 or higher [Doc: Scholarship & Fee Concession Policy 2026-27 §2].\n*   **Dues:** You have no overdue entries in the fee ledger, satisfying the eligibility condition [Doc: Scholarship & Fee Concession Policy 2026-27 §3].\n\nPlease note that this concession is credited against the next academic year's tuition and is split proportionally across the two instalments [Doc: Scholarship & Fee Concession Policy 2026-27 §4].",
+    "sql": "SELECT s.full_name, s.cgpa, fl.component, fl.amount_due - fl.amount_paid AS outstanding_balance, fl.status, fs.amount AS annual_tuition_fee FROM students AS s LEFT JOIN fee_ledger AS fl ON s.student_id = fl.student_id AND fl.status = 'overdue' JOIN departments AS d ON s.dept_id = d.dept_id JOIN fee_structure AS fs ON s.dept_id = fs.dept_id AND s.year_of_study = fs.year_of_study WHERE s.student_id = 'S2025CS017' AND d.code = 'CS' AND fs.component = 'tuition' AND fs.academic_year = '2026-27' LIMIT 200",
+    "sql_columns": [
+      "full_name",
+      "cgpa",
+      "component",
+      "outstanding_balance",
+      "status",
+      "annual_tuition_fee"
+    ],
+    "sql_rows": [
+      {
+        "full_name": "Riya Shah",
+        "cgpa": 8.6,
+        "component": null,
+        "outstanding_balance": null,
+        "status": null,
+        "annual_tuition_fee": 145000
+      }
+    ],
+    "notes": []
+  },
+  {
+    "id": "H6",
+    "route": "hybrid",
+    "stage": "llm",
+    "gen_requests": 3,
+    "api_calls": 1,
+    "latency_ms": 14681,
+    "facts_found": 2,
+    "facts_total": 2,
+    "missing": [],
+    "verification_ok": true,
+    "verification": "All 6 figures verified against the evidence.",
+    "answer": "No, you are currently not eligible to renew your hostel room for the next academic year.\n\nAccording to the **Hostel Rules & Allotment Policy 2026-27 §3**, renewal requires that a student has no overdue fee dues of any kind. Additionally, the **Fee Payment & Refund Policy 2026-27 §5** states that a student with any overdue entry in the fee ledger is not eligible for hostel renewal.\n\nYour eligibility status is as follows:\n\n*   **CGPA:** 7.45 (Requirement: ≥ 6.0) — **Pass** [Doc: Hostel Rules & Allotment Policy 2026-27 §3]\n*   **Overdue Dues:** You have an outstanding balance of ₹87,000 [SQL] — **Fail** [Doc: Hostel Rules & Allotment Policy 2026-27 §3]\n\n**Details of overdue dues:**\n\n| Component | Amount Due | Due Date | Status |\n| :--- | :--- | :--- | :--- |\n| tuition_inst1 | ₹87,000 | 14 Aug 2026 | overdue |\n\nPlease note that the renewal window for the next academic year is 1 April to 30 April 2027 [Doc: Hostel Rules & Allotment Policy 2026-27 §3]. You must clear your outstanding balance to become eligible for renewal.",
+    "sql": "SELECT s.cgpa, f.txn_id, f.component, f.amount_due, f.amount_paid, (f.amount_due - f.amount_paid) AS outstanding_balance, f.due_date, f.status FROM students AS s JOIN fee_ledger AS f ON s.student_id = f.student_id WHERE s.student_id = 'S2025CS003' AND f.status = 'overdue' LIMIT 200",
+    "sql_columns": [
+      "cgpa",
+      "txn_id",
+      "component",
+      "amount_due",
+      "amount_paid",
+      "outstanding_balance",
+      "due_date",
+      "status"
+    ],
+    "sql_rows": [
+      {
+        "cgpa": 7.45,
+        "txn_id": 90,
+        "component": "tuition_inst1",
+        "amount_due": 87000,
+        "amount_paid": 0,
+        "outstanding_balance": 87000,
+        "due_date": "2026-08-14",
+        "status": "overdue"
+      }
+    ],
+    "notes": []
+  }
+]

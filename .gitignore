@@ -1,0 +1,22 @@
+# Secrets
+.env
+
+# Private notes (not part of submission)
+_private/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Caches and run outputs
+.cache/
+eval/results/*.tmp
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

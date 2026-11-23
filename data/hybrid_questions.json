@@ -1,0 +1,82 @@
+[
+  {
+    "id": "H1",
+    "question": "I am a third-year CS student with a 3.8 GPA; what research grants am I eligible for, and what is the deadline to apply?",
+    "expected": "A 3.8 GPA on the 4-point scale converts to CGPA 9.50 (Handbook §4). Matching the Research Grant Policy rules (CGPA, year, department) against grant status, amounts and deadlines in the Grants Register:\n  - **GR-AI-01 AI for Social Good Research Fellowship**: ₹1,50,000, apply by **20 Dec 2026** (open)\n  - **GR-ML-02 Undergraduate Machine Learning Research Assistantship**: ₹60,000, apply by **10 Jan 2027** (open)\n  - **GR-CY-03 Cybersecurity Research Scholarship**: ₹75,000, apply by **31 Jan 2027** (open) — only if the student has no overdue fee dues\n  - **GR-SUS-08 Sustainability & Green Computing Grant**: ₹70,000, apply by **28 Feb 2027** (open)\n  - **GR-HC-10 HealthTech Innovation Grant**: ₹90,000, not open yet — applications from 05 Jan 2027, deadline 15 Mar 2027\n  - **GR-SP-14 Summer Research Internship Stipend**: ₹40,000, not open yet — applications from 01 Dec 2026, deadline 31 Mar 2027\n  - GR-HW-06 Hardware Hackathon Seed Fund: eligible but **closed** (all awards filled)\n  - GR-ROB-12 Autonomous Robotics Research Grant: eligible but **closed** (all awards filled)",
+    "sources": "Docs: Handbook §4 (conversion), Grant Policy §3 (eligibility) · SQL: grants (status, amount, deadline)",
+    "key_facts": [
+      "GR-AI-01",
+      "₹1,50,000",
+      "20 Dec 2026",
+      "GR-ML-02",
+      "₹60,000",
+      "10 Jan 2027",
+      "GR-CY-03",
+      "₹75,000",
+      "31 Jan 2027",
+      "GR-SUS-08",
+      "₹70,000",
+      "28 Feb 2027",
+      "GR-HC-10",
+      "₹90,000",
+      "15 Mar 2027",
+      "GR-SP-14",
+      "₹40,000",
+      "31 Mar 2027"
+    ]
+  },
+  {
+    "id": "H2",
+    "question": "Can student S2026CS003 get the hall ticket for all end-semester exams this term?",
+    "expected": "Not automatically. Krishna Kale has paid the exam fee in full and meets the 75% attendance rule in every course except **CS102 Engineering Physics** (73.5%). Because that is between 65% and 75%, attendance can be condoned with a medical certificate and a condonation fee of ₹500 (Examination & Attendance Rules §3); otherwise the student is detained from that course's exam only.",
+    "sources": "Docs: Exam & Attendance Rules §2–§5 · SQL: enrollments.attendance_pct, fee_ledger (exam)",
+    "key_facts": [
+      "CS102",
+      "73.5%",
+      "₹500"
+    ]
+  },
+  {
+    "id": "H3",
+    "question": "As of 30 November 2026, how much late fine has student S2026CS012 accumulated on overdue fees?",
+    "expected": "Siddharth Ranade has these overdue items (Fee Payment & Refund Policy §4: ₹100 per day per component, capped at ₹5,000; flat ₹500 for the exam fee):\n  - tuition_inst1: balance ₹45,000, due 14 Aug 2026 → 108 days × ₹100 = ₹10,800, capped at ₹5,000 → **₹5,000**\n  - exam: balance ₹3,500, due 31 Oct 2026 → flat exam late fee ₹500 → **₹500**\n  - **Total late fine: ₹5,500**",
+    "sources": "Docs: Fee Policy §4 · SQL: fee_ledger (status, due_date, balances)",
+    "key_facts": [
+      "₹5,000",
+      "₹500",
+      "₹5,500"
+    ]
+  },
+  {
+    "id": "H4",
+    "question": "Student S2023ENTC001 wants to add one more 3-credit elective this term. Is that allowed?",
+    "expected": "Not this term. On credits alone it would be allowed: Varun Sharma (CGPA 8.82) is registered for **25 credits** in 2026-ODD, and with CGPA ≥ 8.5 the limit is 28 credits with HoD approval, so 25 + 3 = 28 fits (Course Registration & Credit Policy §3). But the add/drop period for 2026-ODD ended on **10 Aug 2026** (§4), so no course can be added now; the student can plan it for the next term.",
+    "sources": "Docs: Course Registration Policy §3–§4 · SQL: students.cgpa, enrollments + courses.credits",
+    "key_facts": [
+      "25",
+      "28",
+      "10 Aug 2026"
+    ]
+  },
+  {
+    "id": "H5",
+    "question": "Is student S2025CS017 eligible for a merit fee concession, and how much would it be?",
+    "expected": "Yes. Riya Shah has CGPA 8.60 (slab 8.50–8.99 → 15%) and no overdue fees (Scholarship & Fee Concession Policy §2–§3). The concession is 15% of the annual tuition of ₹1,45,000 in the 2026-27 fee structure for CS Year 2 = **₹21,750**, applied to next year's tuition.",
+    "sources": "Docs: Scholarship Policy §2–§3 · SQL: students.cgpa, fee_ledger (overdue check), fee_structure",
+    "key_facts": [
+      "15%",
+      "₹1,45,000",
+      "₹21,750"
+    ]
+  },
+  {
+    "id": "H6",
+    "question": "Can student S2025CS003 renew their hostel room for next year?",
+    "expected": "Not at present. Krishna Iyer meets the academic condition (CGPA 7.45 ≥ 6.0) but has overdue fees: tuition_inst1 (₹87,000 due since 14 Aug 2026). Hostel Rules §3 require no overdue dues for renewal, so the room can be renewed once these are cleared before the renewal window closes.",
+    "sources": "Docs: Hostel Rules §3 · SQL: students (cgpa, is_hosteller), fee_ledger (overdue)",
+    "key_facts": [
+      "₹87,000",
+      "7.45"
+    ]
+  }
+]

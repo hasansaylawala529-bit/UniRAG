@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: unirag
+Version: 0.1.0
+Summary: Unified Hybrid RAG for structured and unstructured university data
+Requires-Python: >=3.11

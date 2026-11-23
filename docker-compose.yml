@@ -1,0 +1,23 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: unirag-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-unirag}
+      POSTGRES_USER: ${POSTGRES_USER:-unirag_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-unirag_admin_pw}
+    ports:
+      - "5433:5432"
+    volumes:
+      - unirag_pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./data/seed:/seed:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-unirag_admin} -d ${POSTGRES_DB:-unirag}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  unirag_pgdata:

@@ -1,0 +1,23 @@
+{
+  "id": "SQL03",
+  "question": "What is the annual tuition for a third-year ENTC student?",
+  "student": null,
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "The annual tuition for a third-year ENTC student is ₹1,30,000 [SQL].\n\nFee amounts for each department and year of study are determined by the Fee Structure 2026-27 [Doc: Fee Payment & Refund Policy 2026-27 §1 Scope].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT fs.amount FROM fee_structure AS fs JOIN departments AS d ON fs.dept_id = d.dept_id WHERE d.code = 'ENTC' AND fs.year_of_study = 3 AND fs.component = 'tuition' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 7666,
+  "wall_s": 7.67
+}
