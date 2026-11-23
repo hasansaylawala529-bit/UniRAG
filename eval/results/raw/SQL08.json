@@ -1,0 +1,23 @@
+{
+  "id": "SQL08",
+  "question": "How many seats are still free in the CS3E1 Machine Learning elective?",
+  "student": null,
+  "expected_route": "sql",
+  "route": "sql",
+  "stage": "llm",
+  "answer": "There are currently 2 seats free in the CS3E1 Machine Learning elective [SQL].\n\n| Course Code | Title | Free Seats |\n| :--- | :--- | :--- |\n| CS3E1 | Machine Learning | 2 |\n\nThis information is based on the University's course and enrollment records [Doc: Course Registration & Credit Policy 2026-27 §1 Scope].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT c.course_code, c.title, (c.capacity - COUNT(e.enrollment_id)) AS free_seats FROM courses AS c LEFT JOIN enrollments AS e ON c.course_id = e.course_id AND e.status = 'enrolled' WHERE c.course_code = 'CS3E1' GROUP BY c.course_code, c.title, c.capacity LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 101821,
+  "wall_s": 1.96
+}

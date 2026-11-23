@@ -1,0 +1,23 @@
+{
+  "id": "DOC07",
+  "question": "What percentage merit concession does a CGPA of 9.2 earn?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "A CGPA of 9.2 earns a merit concession of 25% of your annual tuition [Doc: Scholarship & Fee Concession Policy 2026-27 §2].\n\nThis eligibility is determined based on the following merit concession slabs:\n\n| CGPA | Concession |\n|---|---|\n| 9.00 and above | 25% of annual tuition |\n| 8.50 – 8.99 | 15% of annual tuition |\n| 8.00 – 8.49 | 10% of annual tuition |\n| Below 8.00 | Not eligible |\n\nYour CGPA of 9.2 meets the requirement for the 25% tier (9.2 ≥ 9.00) [Doc: Scholarship & Fee Concession Policy 2026-27 §2]. Please note that this concession applies only to tuition fees; examination, laboratory, and hostel fees are not reduced [Doc: Scholarship & Fee Concession Policy 2026-27 §2].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 29233,
+  "wall_s": 0.23
+}

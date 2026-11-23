@@ -1,0 +1,12 @@
+{
+  "id": "H5",
+  "answer": "The provided policy documents do not contain information regarding the specific academic records, fee ledger status, or CGPA of student S2025CS017. Therefore, I cannot determine if this student is eligible for a merit fee concession or calculate the specific amount.\n\nTo determine eligibility, the student must meet the criteria outlined in [Doc: Scholarship & Fee Concession Policy 2026-27 §3 Eligibility conditions], which requires a declared CGPA, no overdue entries in the fee ledger, no F grades in the current academic year, and no findings of academic dishonesty. If eligible, the concession amount is determined by the slabs in [Doc: Scholarship & Fee Concession Policy 2026-27 §2 Merit concession slabs] based on the student's CGPA.",
+  "facts_found": 0,
+  "facts_total": 3,
+  "missing": [
+    "15%",
+    "₹1,45,000",
+    "₹21,750"
+  ],
+  "verdict_ok": true
+}

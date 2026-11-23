@@ -1,0 +1,11 @@
+{
+  "id": "HYB11",
+  "answer": "The provided policy documents do not contain information regarding your specific attendance records or which of your courses are currently below the attendance requirement.\n\nRegarding whether a shortfall can be condoned:\n*   If your attendance is **at least 65% but below 75%**, the shortfall may be condoned on medical or other documented grounds [Doc: Examination & Attendance Rules 2026-27 §3].\n*   To request this, you must submit an application with supporting documents to the Head of Department and pay a fee of ₹500 per course before the last teaching day of the term [Doc: Examination & Attendance Rules 2026-27 §3].\n*   You may receive condonation for a maximum of two courses per term [Doc: Examination & Attendance Rules 2026-27 §3].\n*   If your attendance is **below 65%**, you are detained in that course and cannot be granted condonation [Doc: Examination & Attendance Rules 2026-27 §4].",
+  "facts_found": 1,
+  "facts_total": 3,
+  "missing": [
+    "CS301",
+    "66.9%"
+  ],
+  "verdict_ok": true
+}

@@ -5,7 +5,7 @@
   "expected_route": "sql",
   "route": "sql",
   "stage": "llm",
-  "answer": "The annual tuition for a third-year ENTC student is ₹1,30,000 [SQL].\n\nFee amounts for each department and year of study are determined by the Fee Structure 2026-27 [Doc: Fee Payment & Refund Policy 2026-27 §1 Scope].",
+  "answer": "The annual tuition fee for a third-year ENTC student is ₹1,30,000 [SQL].\n\nThis amount is determined based on the current fee structure for the ENTC department and the student's year of study [Doc: Fee Payment & Refund Policy 2026-27 §1 Scope].",
   "facts_found": 1,
   "facts_total": 1,
   "missing": [],
@@ -19,5 +19,5 @@
   "gen_requests": 3,
   "api_calls": 3,
   "latency_ms": 7666,
-  "wall_s": 7.67
+  "wall_s": 2.07
 }

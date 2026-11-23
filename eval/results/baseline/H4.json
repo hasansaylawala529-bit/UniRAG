@@ -1,0 +1,11 @@
+{
+  "id": "H4",
+  "answer": "Whether Student S2023ENTC001 is allowed to add an elective depends on their current credit load, their CGPA, and the current date. The provided policy passages do not contain the student's current credit total, their CGPA, or the current date, so I cannot confirm if the addition is permitted.\n\nHowever, the following rules apply to your request:\n\n*   **Add/drop deadline:** Courses cannot be added after the add/drop period, which ends 14 days after classes begin [Doc: Course Registration & Credit Policy 2026-27 §4].\n*   **Credit limits:** The normal maximum is 24 credits per term. Students with a CGPA of 8.5 or higher may register for up to 28 credits with Head of Department approval [Doc: Course Registration & Credit Policy 2026-27 §3].\n*   **Academic probation:** Students on academic probation are limited to a maximum of 18 credits [Doc: Course Registration & Credit Policy 2026-27 §3; Doc: Student Handbook 2026-27 §5].",
+  "facts_found": 1,
+  "facts_total": 3,
+  "missing": [
+    "25",
+    "10 Aug 2026"
+  ],
+  "verdict_ok": true
+}

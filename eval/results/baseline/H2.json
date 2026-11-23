@@ -1,0 +1,12 @@
+{
+  "id": "H2",
+  "answer": "Whether student S2026CS003 can receive a hall ticket for all end-semester exams depends on two conditions:\n\n1. **Fee Payment:** The examination fee for the term must be fully paid in the fee ledger [Doc: Examination & Attendance Rules 2026-27 §5].\n2. **Attendance:** The student must meet the minimum attendance requirement of at least 75% in each registered course, or have an approved condonation for any course where attendance is lower [Doc: Examination & Attendance Rules 2026-27 §2; Doc: Examination & Attendance Rules 2026-27 §5].\n\nThe provided documents do not contain information regarding the specific fee balance or the current attendance percentage for student S2026CS003. Therefore, it cannot be determined if they will receive a hall ticket for all exams. If the student has not met the attendance requirement or has not received a condonation, they will be detained in those specific courses, and those courses will be left off the hall ticket [Doc: Examination & Attendance Rules 2026-27 §4; Doc: Examination & Attendance Rules 2026-27 §5].",
+  "facts_found": 0,
+  "facts_total": 3,
+  "missing": [
+    "CS102",
+    "73.5%",
+    "₹500"
+  ],
+  "verdict_ok": true
+}

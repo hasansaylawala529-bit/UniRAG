@@ -1,0 +1,21 @@
+{
+  "id": "H1",
+  "answer": "Based on your 3.8 GPA, your converted CGPA is 9.5 on a 10-point scale [Doc: Research Grant Policy 2026-27 §2]. As a third-year Computer Science student, you meet the eligibility criteria for the following research grants:\n\n*   **GR-AI-01 — AI for Social Good Research Fellowship** [Doc: Research Grant Policy 2026-27 §3]\n*   **GR-CY-03 — Cybersecurity Research Scholarship** (provided you have no overdue fee dues) [Doc: Research Grant Policy 2026-27 §3]\n*   **GR-ML-02 — Undergraduate Machine Learning Research Assistantship** [Doc: Research Grant Policy 2026-27 §3]\n*   **GR-SUS-08 — Sustainability & Green Computing Grant** [Doc: Research Grant Policy 2026-27 §3]\n*   **GR-ROB-12 — Autonomous Robotics Research Grant** [Doc: Research Grant Policy 2026-27 §3]\n*   **GR-SP-14 — Summer Research Internship Stipend** [Doc: Research Grant Policy 2026-27 §3]\n*   **GR-HC-10 — HealthTech Innovation Grant** [Doc: Research Grant Policy 2026-27 §3]\n\nRegarding the deadline to apply, the provided policy documents do not contain specific dates; you must check the Grants Register to determine the deadline and ensure the grant's status is \"open\" [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 6,
+  "facts_total": 18,
+  "missing": [
+    "₹1,50,000",
+    "20 Dec 2026",
+    "₹60,000",
+    "10 Jan 2027",
+    "₹75,000",
+    "31 Jan 2027",
+    "₹70,000",
+    "28 Feb 2027",
+    "₹90,000",
+    "15 Mar 2027",
+    "₹40,000",
+    "31 Mar 2027"
+  ],
+  "verdict_ok": true
+}

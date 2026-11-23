@@ -1,0 +1,23 @@
+{
+  "id": "DOC01",
+  "question": "Below what attendance percentage am I barred from a course's end-semester exam?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "You are barred from a course's end-semester examination if your attendance falls below 65% [Doc: Examination & Attendance Rules 2026-27 §4 Detention].\n\nWhile the standard requirement is at least 75% attendance [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance], you may be eligible for condonation if your attendance is between 65% and 75% [Doc: Examination & Attendance Rules 2026-27 §3 Condonation of attendance].\n\n**Attendance Status Summary:**\n\n| Attendance Range | Status |\n| :--- | :--- |\n| 75% or higher | Eligible for exam [Doc: Examination & Attendance Rules 2026-27 §2] |\n| 65% to < 75% | Eligible for exam if condonation is approved [Doc: Examination & Attendance Rules 2026-27 §3] |\n| Below 65% | Detained; cannot take exam [Doc: Examination & Attendance Rules 2026-27 §4] |\n\n**Conditions for Condonation:**\n*   **Grounds:** Must be based on medical or other documented reasons [Doc: Examination & Attendance Rules 2026-27 §3].\n*   **Application:** Submit an application with supporting documents to the Head of Department before the last teaching day of the term [Doc: Examination & Attendance Rules 2026-27 §3].\n*   **Fee:** A condonation fee of ₹500 per course applies [Doc: Examination & Attendance Rules 2026-27 §3].\n*   **Limit:** You may receive condonation in at most two courses per term [Doc: Examination & Attendance Rules 2026-27 §3].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 77878,
+  "wall_s": 0.16
+}

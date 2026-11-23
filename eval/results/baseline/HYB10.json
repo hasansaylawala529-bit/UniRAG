@@ -1,0 +1,8 @@
+{
+  "id": "HYB10",
+  "answer": "The provided policy documents do not contain the information necessary to determine your specific refund amount, as the refund calculation depends on the date of your withdrawal request relative to the start of classes for the term, which is not provided.\n\nAccording to the policy, tuition refunds are calculated as follows:\n\n*   **Before classes begin:** 90% of tuition paid, less a processing fee of ₹1,000 [Doc: Fee Payment & Refund Policy 2026-27 §6].\n*   **Within 14 days after classes begin:** 75% of tuition paid [Doc: Fee Payment & Refund Policy 2026-27 §6].\n*   **15–30 days after classes begin:** 50% of tuition paid [Doc: Fee Payment & Refund Policy 2026-27 §6].\n*   **More than 30 days after classes begin:** No refund [Doc: Fee Payment & Refund Policy 2026-27 §6].\n\nAdditionally, please note that examination and laboratory fees are non-refundable once the term has started [Doc: Fee Payment & Refund Policy 2026-27 §6].",
+  "facts_found": 0,
+  "facts_total": 0,
+  "missing": [],
+  "verdict_ok": true
+}

@@ -1,0 +1,11 @@
+{
+  "id": "H6",
+  "answer": "To determine if student S2025CS003 can renew their hostel room, they must meet the following criteria:\n\n1.  **Academic Performance:** A CGPA of 6.0 or higher (10-point scale) at the time of renewal [Doc: Hostel Rules & Allotment Policy 2026-27 §3].\n2.  **Fee Status:** No overdue fee dues of any kind in the fee ledger [Doc: Hostel Rules & Allotment Policy 2026-27 §3; Doc: Fee Payment & Refund Policy 2026-27 §5].\n3.  **Disciplinary Record:** No more than one recorded disciplinary warning in the current year [Doc: Hostel Rules & Allotment Policy 2026-27 §3].\n4.  **Timing:** The renewal must be completed within the window of 1 April to 30 April 2027 [Doc: Hostel Rules & Allotment Policy 2026-27 §3].\n\nThe provided documents do not contain the specific CGPA, fee balance, or disciplinary record for student S2025CS003; therefore, I cannot confirm if this specific student is eligible to renew their room.",
+  "facts_found": 0,
+  "facts_total": 2,
+  "missing": [
+    "₹87,000",
+    "7.45"
+  ],
+  "verdict_ok": true
+}

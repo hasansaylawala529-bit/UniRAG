@@ -1,0 +1,23 @@
+{
+  "id": "DOC03",
+  "question": "How is the late fine on an overdue tuition instalment calculated, and is there a maximum?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "Late fines for overdue tuition instalments are calculated at a rate of ₹100 per day, starting from the day after the due date, and are subject to a maximum limit of ₹5,000 per component [Doc: Fee Payment & Refund Policy 2026-27 §4].\n\n**Late Fine Details:**\n*   **Daily Rate:** ₹100 per day [Doc: Fee Payment & Refund Policy 2026-27 §4]\n*   **Maximum Cap:** ₹5,000 per component [Doc: Fee Payment & Refund Policy 2026-27 §4]\n\nPlease note that these fines are charged in addition to the outstanding balance and must be paid in full for the component to be considered cleared [Doc: Fee Payment & Refund Policy 2026-27 §4]. The Accounts Office may waive these fines only in cases of documented medical emergencies or bereavement, provided an application is submitted within 30 days [Doc: Fee Payment & Refund Policy 2026-27 §4]. \n\nNote that late examination fees are treated differently, incurring a flat charge of ₹500 rather than the daily fine [Doc: Fee Payment & Refund Policy 2026-27 §4].",
+  "facts_found": 2,
+  "facts_total": 2,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 11193,
+  "wall_s": 0.23
+}

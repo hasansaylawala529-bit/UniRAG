@@ -1,0 +1,25 @@
+{
+  "id": "H2",
+  "question": "Can student S2026CS003 get the hall ticket for all end-semester exams this term?",
+  "student": null,
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "No, student S2026CS003 cannot get a hall ticket for all end-semester exams because they do not meet the minimum attendance requirement for all courses [Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets].\n\nTo receive a hall ticket, a student must have their examination fee fully paid and maintain at least 75% attendance in each registered course [Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets; Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance]. While the examination fee status is \"paid\" for all courses [SQL], the attendance records are as follows:\n\n| Course Code | Title | Attendance | Status |\n| :--- | :--- | :--- | :--- |\n| CS101 | Engineering Mathematics I | 79.6% | Eligible |\n| CS102 | Engineering Physics | 73.5% | **Ineligible** |\n| CS103 | Programming in C | 85.6% | Eligible |\n| CS104 | Basic Electrical Engineering | 77.2% | Eligible |\n| CS105 | Programming Lab I | 77.8% | Eligible |\n\n**Reasoning:**\n*   **Attendance:** CS102 (73.5%) is below the 75% requirement [Doc: Examination & Attendance Rules 2026-27 §2 Minimum attendance]. Attendance between 65% and 75% may be eligible for condonation with a medical certificate and a fee [Doc: Examination & Attendance Rules 2026-27 §4 Detention].\n*   **Fees:** The examination fee is \"paid\" for all courses [SQL], satisfying the requirement [Doc: Examination & Attendance Rules 2026-27 §5 Hall tickets].",
+  "facts_found": 2,
+  "facts_total": 3,
+  "missing": [
+    "₹500"
+  ],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT c.course_code, c.title, e.attendance_pct, f.component, (f.amount_due - f.amount_paid) AS outstanding_balance, f.status AS fee_status FROM enrollments AS e JOIN courses AS c ON e.course_id = c.course_id LEFT JOIN fee_ledger AS f ON e.student_id = f.student_id AND f.component = 'exam' WHERE e.student_id = 'S2026CS003' AND e.term = '2026-ODD' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 345,
+  "wall_s": 2.73
+}

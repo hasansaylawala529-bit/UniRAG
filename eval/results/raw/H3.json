@@ -1,0 +1,23 @@
+{
+  "id": "H3",
+  "question": "As of 30 November 2026, how much late fine has student S2026CS012 accumulated on overdue fees?",
+  "student": null,
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "As of 30 November 2026, you have accumulated a total late fine of ₹5,500 on your overdue fees [SQL].\n\nThe breakdown of your overdue components and their respective late fines is as follows:\n\n| Component | Due Date | Late Fine |\n| :--- | :--- | :--- |\n| tuition_inst1 | 14 Aug 2026 | ₹5,000 |\n| exam | 31 Oct 2026 | ₹500 |\n| **Total** | | **₹5,500** |\n\n**Supporting Details:**\n*   **Tuition Instalment:** A late fine of ₹100 per day is charged on overdue tuition instalments, capped at ₹5,000 per component [Doc: Fee Payment & Refund Policy 2026-27 §4]. Your tuition_inst1 has been overdue for 108 days [SQL]; while the daily calculation would exceed the limit, the fine is capped at ₹5,000 [Doc: Fee Payment & Refund Policy 2026-27 §4].\n*   **Examination Fee:** A flat late fine of ₹500 is charged for overdue examination fees [Doc: Fee Payment & Refund Policy 2026-27 §4].\n\nLate fines are charged in addition to the outstanding balance and must be cleared before the component is considered paid [Doc: Fee Payment & Refund Policy 2026-27 §4]. The Accounts Office may waive these fines only for documented medical emergencies or bereavement, provided an application is submitted within 30 days [Doc: Fee Payment & Refund Policy 2026-27 §4].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "WITH overdue_fees AS (SELECT component, amount_due, amount_paid, due_date, (CAST('2026-11-30' AS DATE) - due_date) AS days_overdue FROM fee_ledger WHERE student_id = 'S2026CS012' AND status = 'overdue'), fine_calculations AS (SELECT component, amount_due, amount_paid, due_date, days_overdue, CASE WHEN component = 'exam' THEN 500 ELSE LEAST(days_overdue * 100, 5000) END AS late_fine FROM overdue_fees) SELECT component, amount_due, amount_paid, due_date, days_overdue, late_fine, SUM(late_fine) OVER () AS total_late_fine FROM fine_calculations LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 451,
+  "wall_s": 21.99
+}

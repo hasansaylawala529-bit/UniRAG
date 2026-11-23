@@ -1,0 +1,23 @@
+{
+  "id": "DOC04",
+  "question": "If I withdraw ten days after classes begin, what share of the tuition I paid is refunded?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "If you withdraw ten days after classes begin, you are eligible for a refund of 75% of the tuition fee you actually paid [Doc: Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal].\n\nThis is based on the following policy for withdrawals:\n\n| Withdrawal request received | Tuition refund |\n|---|---|\n| Within 14 days after classes begin | 75% of tuition paid |\n\nPlease note the following conditions regarding your refund:\n* Examination and laboratory fees are non-refundable once the term has started [Doc: Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal].\n* Refunds are processed to the original payment account within 30 working days [Doc: Fee Payment & Refund Policy 2026-27 §6 Refunds on withdrawal].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 10411,
+  "wall_s": 0.23
+}

@@ -1,0 +1,23 @@
+{
+  "id": "DOC09",
+  "question": "What minimum CGPA does the VLSI Design Research Fellowship require?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "The VLSI Design Research Fellowship (GR-VLSI-09) requires a minimum CGPA of 8.0 on a 10-point scale [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-VLSI-09 — VLSI Design Research Fellowship].\n\nTo be eligible for this fellowship, applicants must also meet the following criteria:\n\n*   **Eligible year(s) of study:** Year 3, Year 4\n*   **Eligible department(s):** Electronics & Telecommunication (ENTC)\n\n[Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility > GR-VLSI-09 — VLSI Design Research Fellowship]",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 30700,
+  "wall_s": 0.57
+}

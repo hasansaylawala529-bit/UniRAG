@@ -89,3 +89,15 @@ def test_total_of_four_items_is_not_accepted_by_coincidence():
     ans = "Balances ₹45,000, ₹3,500 and ₹60,000; fines ₹5,000 and ₹500. Total outstanding ₹1,13,500."
     r = verify_answer(ans, pool)
     assert [f.text for f in r.unverified] == ["₹1,13,500"]
+
+
+def test_answer_total_must_match_database_total():
+    from unirag.synthesis.verifier import database_totals
+    rows = [{"component": "tuition_inst1", "late_fine": 5000, "total_late_fine": 5500},
+            {"component": "exam", "late_fine": 500, "total_late_fine": 5500}]
+    pool = build_pool(rows=rows, passages_text="processing fee of ₹1,000", rule_text="", profile={},
+                      question="late fine?", as_of=date(2026, 11, 23))
+    bad = verify_answer("Fines: ₹5,000 and ₹1,000. Total ₹6,000.", pool, db_totals=database_totals(rows))
+    assert not bad.ok and any(f.kind == "consistency" for f in bad.unverified)
+    good = verify_answer("Fines: ₹5,000 and ₹500. Total ₹5,500.", pool, db_totals=database_totals(rows))
+    assert good.ok, good.summary()

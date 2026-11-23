@@ -1,0 +1,23 @@
+{
+  "id": "DOC06",
+  "question": "Until what date can hostel residents renew their rooms for next year?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "Hostel residents may renew their rooms for the next academic year between 1 April and 30 April 2027 [Doc: Hostel Rules & Allotment Policy 2026-27 §3 Renewal for the next academic year].\n\nTo be eligible for renewal, residents must meet the following criteria:\n*   **CGPA:** 6.0 or higher (10-point scale) at the time of renewal.\n*   **Fee Dues:** No overdue fee dues of any kind (tuition, examination, laboratory, or hostel).\n*   **Disciplinary Record:** No more than one recorded disciplinary warning in the current year.\n\nPlease note that residents who do not complete the renewal process within this window will lose their room, and it will be offered to students on the waiting list [Doc: Hostel Rules & Allotment Policy 2026-27 §3 Renewal for the next academic year].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 7284,
+  "wall_s": 0.25
+}

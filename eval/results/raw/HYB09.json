@@ -1,0 +1,23 @@
+{
+  "id": "HYB09",
+  "question": "Can I apply for the Cybersecurity Research Scholarship GR-CY-03?",
+  "student": "S2023CS006",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "No, you are currently not eligible to apply for the Cybersecurity Research Scholarship (GR-CY-03).\n\nAccording to the [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility], you do not meet the following requirements:\n\n*   **Minimum CGPA:** Your CGPA is 7.95, which is below the required 8.0 [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility].\n*   **No Overdue Dues:** You have outstanding fee dues, which violates the condition that an applicant must have no overdue fee dues in the University fee ledger [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility].\n\nYour outstanding fee components are as follows:\n\n| Component | Outstanding Balance | Due Date |\n| :--- | :--- | :--- |\n| tuition_inst1 | ₹87,000 | 14 Aug 2026 |\n| lab | ₹8,000 | 14 Aug 2026 |\n\n[SQL]\n\nYou do meet the other eligibility criteria for GR-CY-03, as you are a 4th-year student [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility] in the Computer Science (CS) department [Doc: Research Grant Policy 2026-27 §3 Grant-specific eligibility].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT component, (amount_due - amount_paid) AS outstanding_balance, due_date FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2023CS006') AS fee_ledger WHERE student_id = 'S2023CS006' AND amount_due > amount_paid ORDER BY due_date ASC LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 109521,
+  "wall_s": 30.53
+}

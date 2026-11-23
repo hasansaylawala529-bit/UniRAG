@@ -1,0 +1,23 @@
+{
+  "id": "H5",
+  "question": "Is student S2025CS017 eligible for a merit fee concession, and how much would it be?",
+  "student": null,
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "semantic",
+  "answer": "Yes, student S2025CS017 (Riya Shah) is eligible for a merit fee concession. Based on a CGPA of 8.6 [SQL], you qualify for a 15% concession on your annual tuition fee [Doc: Scholarship & Fee Concession Policy 2026-27 §2].\n\n**Calculation:**\n*   **Annual Tuition Fee:** ₹1,45,000 [SQL]\n*   **Concession Percentage:** 15% (for CGPA 8.50 – 8.99) [Doc: Scholarship & Fee Concession Policy 2026-27 §2]\n*   **Total Concession Amount:** 15% × ₹1,45,000 = ₹21,750\n\n**Eligibility Verification:**\n*   **CGPA Requirement:** Your CGPA of 8.6 meets the minimum requirement of 8.50 [Doc: Scholarship & Fee Concession Policy 2026-27 §2].\n*   **Overdue Dues:** You have no overdue entries in the fee ledger, satisfying the eligibility condition [Doc: Scholarship & Fee Concession Policy 2026-27 §3].\n\nPlease note that this concession is not paid out in cash; it will be credited against the next academic year's tuition, split proportionally across the two installments [Doc: Scholarship & Fee Concession Policy 2026-27 §4].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT s.full_name, s.cgpa, fl.component, fl.amount_due - fl.amount_paid AS outstanding_balance, fl.status, fs.amount AS annual_tuition_fee FROM students AS s LEFT JOIN fee_ledger AS fl ON s.student_id = fl.student_id AND fl.status = 'overdue' JOIN departments AS d ON s.dept_id = d.dept_id JOIN fee_structure AS fs ON s.dept_id = fs.dept_id AND s.year_of_study = fs.year_of_study WHERE s.student_id = 'S2025CS017' AND d.code = 'CS' AND fs.component = 'tuition' AND fs.academic_year = '2026-27' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 0,
+  "latency_ms": 371,
+  "wall_s": 9.33
+}

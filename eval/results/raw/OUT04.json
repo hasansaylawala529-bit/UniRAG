@@ -1,0 +1,23 @@
+{
+  "id": "OUT04",
+  "question": "What is Infosys trading at today?",
+  "student": null,
+  "expected_route": "out_of_scope",
+  "route": "out_of_scope",
+  "stage": "llm",
+  "answer": "I can only help with DVUT questions about courses and timetables, fees and refunds, research grants and scholarships, exams and attendance, hostel rules and course registration. Could you rephrase your question around one of these?",
+  "facts_found": 0,
+  "facts_total": 0,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 1,
+  "api_calls": 1,
+  "latency_ms": 2620,
+  "wall_s": 0.18
+}

@@ -1,0 +1,11 @@
+{
+  "id": "HYB12",
+  "answer": "The amount of merit concession you will receive depends on your CGPA at the end of the academic year, provided you meet all eligibility conditions [Doc: Scholarship & Fee Concession Policy 2026-27 §2, §3].\n\nThe concession is calculated as a percentage of your annual tuition based on the following slabs:\n*   **9.00 and above:** 25% of annual tuition [Doc: Scholarship & Fee Concession Policy 2026-27 §2]\n*   **8.50 – 8.99:** 15% of annual tuition [Doc: Scholarship & Fee Concession Policy 2026-27 §2]\n*   **8.00 – 8.49:** 10% of annual tuition [Doc: Scholarship & Fee Concession Policy 2026-27 §2]\n*   **Below 8.00:** Not eligible [Doc: Scholarship & Fee Concession Policy 2026-27 §2]\n\nTo determine the specific monetary value, the slab percentage is multiplied by the annual tuition listed in the current year's Fee Structure for your department and year of study [Doc: Scholarship & Fee Concession Policy 2026-27 §4]. \n\nPlease note that the provided documents do not contain your specific CGPA, your department, your year of study, or the current annual tuition amount, so I cannot calculate the exact live amount for you.",
+  "facts_found": 1,
+  "facts_total": 3,
+  "missing": [
+    "₹1,45,000",
+    "₹36,250"
+  ],
+  "verdict_ok": true
+}

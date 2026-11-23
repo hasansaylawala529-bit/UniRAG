@@ -1,0 +1,23 @@
+{
+  "id": "HYB10",
+  "question": "If I withdraw from the university today, how much of my tuition will be refunded?",
+  "student": "S2025CS001",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "If you withdraw from the university today, you are not eligible for a tuition refund.\n\nAccording to the Fee Payment & Refund Policy 2026-27 §6, no refund is provided if a withdrawal request is received more than 30 days after classes begin. As 74 days have elapsed since classes began [SQL], you fall into this category.\n\n**Summary of your status:**\n*   **Total tuition paid:** ₹1,45,000 [SQL]\n*   **Days since classes began:** 74 days [SQL]\n*   **Refund eligibility:** No refund [Doc: Fee Payment & Refund Policy 2026-27 §6]\n\nPlease note that examination and laboratory fees are non-refundable once the term has started [Doc: Fee Payment & Refund Policy 2026-27 §6].",
+  "facts_found": 0,
+  "facts_total": 0,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT SUM(amount_paid) AS total_tuition_paid, (CAST('2026-10-27' AS DATE) - MIN(due_date)) AS days_since_classes_began FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2025CS001') AS fee_ledger WHERE student_id = 'S2025CS001' AND component LIKE 'tuition%' LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 38812,
+  "wall_s": 2.6
+}

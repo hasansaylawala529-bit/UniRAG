@@ -79,9 +79,14 @@ def run_baseline(item: dict) -> dict:
 
 
 def cached_run(path: Path, fn, item: dict, fresh: bool) -> dict:
-    if path.exists() and not fresh:
-        return json.loads(path.read_text(encoding="utf-8"))
+    old = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+    if old and not fresh:
+        return old
     rec = fn(item)
+    # a re-run reuses cached planner/SQL calls, so its latency would flatter the system:
+    # keep the latency of the first (fully live) run
+    if old and "latency_ms" in old and "latency_ms" in rec:
+        rec["latency_ms"], rec["api_calls"] = old["latency_ms"], old.get("api_calls", rec["api_calls"])
     path.write_text(json.dumps(rec, indent=2, ensure_ascii=False), encoding="utf-8")
     return rec
 

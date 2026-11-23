@@ -449,6 +449,30 @@ Report results honestly, including failures, and list the three most important r
 - **Review:** offline end-to-end run with the stand-in model to test the plumbing (its scores are meaningless and were deleted); charts inspected visually. The real numbers come from the live run next.
 
 
+### P-014 · First full evaluation → results and fixes
+- **Date/time:** 2026-11-23, 17:56 IST
+- **Goal:** Read the first full evaluation, separate real failures from scoring artefacts, and fix what would hurt a live demo.
+- **Prompt:** I shared the terminal output of `eval/build_questions.py` and `eval/run_eval.py`. Key lines:
+```text
+Routing accuracy: 35/36 (97%) · decided by semantic router 8, LLM planner 28
+Key facts: SQL 16/22 (73%) · Documents 11/11 (100%) · Hybrid 54/59 (92%) · Out of scope declined 4/4 · All 81/92 (88%)
+Hybrid: vector-only RAG 14/59 (24%), 1/12 fully correct  vs  UniRAG 54/59 (92%), 8/12 fully correct
+Verifier 36/36 · LLM SQL 19/19 first attempt (3 more compiled in code)
+Latency median / p90: SQL 26.5 / 97.6 s · Documents 18.1 / 59.1 s · Hybrid 72.6 / 82.4 s  (many Google 503 retries in the log)
+```
+- **Analysis of every imperfect answer** (from `eval/results/raw/*.json`):
+  - **H3: wrong, and missed by the verifier.** The SQL computed the fines correctly (₹5,000 + ₹500, `total_late_fine` ₹5,500), but the answer stated the exam fine as ₹1,000 and the total as ₹6,000. The verifier accepted both by **coincidence**: ₹1,000 appears in a retrieved passage (the refund processing fee), and ₹6,000 = ₹5,000 + ₹1,000. The independent key-fact check did catch it (₹5,500 missing).
+  - **SQL06: context failure.** The SQL was correct (`WHERE instructor = 'Prof. A. Phadke'`), but the rows held only course codes and titles, so the answer model said there was "no information".
+  - **H1, H2, H4: omissions**, not errors (amounts of upcoming grants, the ₹500 fee, the 28-credit limit).
+  - **SQL02:** routed hybrid instead of sql, but the answer was fully correct.
+  - **Latency** is dominated by Google 503/504 retries on the free tier, not by the pipeline. It is reported as measured.
+- **Fixes:**
+  1. **Database totals are authoritative.** When the SQL returns a `total*` column, the answer step is given "Database-computed total(s): … use exactly this figure". A new **consistency check** in the verifier flags any answer that states a total different from the database total, regardless of coincidental matches. Regression test reproduces the H3 case.
+  2. **Query context for synthesis.** The answer step now receives the query's one-line explanation and the SQL with the rows, so it knows what the rows represent.
+  3. **Regression found while testing:** the P-012 personal-records rule also caught "What happens if *my attendance is 70 percent*?", a hypothetical policy question (and a UI example). A question that states its own value is now exempt. New `tests/test_profile.py`.
+  4. `run_eval.py --fresh` keeps the first run's (fully live) latency, because a re-run reuses cached planner/SQL calls and would otherwise report flattering latency.
+- **Review:** 63 tests pass; offline graph run is unchanged except for the corrected attendance route. Re-run the evaluation next.
+
 ## Phase 6 – Demo, presentation & delivery
 
 ---

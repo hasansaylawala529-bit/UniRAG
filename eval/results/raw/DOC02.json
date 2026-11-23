@@ -1,0 +1,23 @@
+{
+  "id": "DOC02",
+  "question": "What does attendance condonation cost per course?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "The condonation fee for attendance is ₹500 per course [Doc: Examination & Attendance Rules 2026-27 §3].\n\nTo be eligible for condonation, the following conditions must be met:\n* **Attendance Requirement:** Your attendance in the course must be at least 65% but below 75% [Doc: Examination & Attendance Rules 2026-27 §3].\n* **Documentation:** You must submit an application with supporting documents, such as a medical certificate, to the Head of Department [Doc: Examination & Attendance Rules 2026-27 §3].\n* **Deadline:** The request must be made before the last teaching day of the term [Doc: Examination & Attendance Rules 2026-27 §3].\n* **Limit:** A student may receive condonation in at most two courses per term [Doc: Examination & Attendance Rules 2026-27 §3].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 59054,
+  "wall_s": 0.15
+}

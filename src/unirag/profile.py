@@ -24,6 +24,8 @@ PERSONAL_RECORD_RE = re.compile(
     r"\b(my|mine)\s+(\w+\s+)?(fee|fees|dues|balance|ledger|payment|payments|cgpa|gpa|grade|grades|"
     r"attendance|course|courses|enrol\w*|timetable|schedule|credits|hostel|application|applications|result|"
     r"results|record|records|profile)\b", re.I)
+# "my attendance is 70 percent" states the value: a hypothetical policy question, not a record lookup
+STATED_VALUE_RE = re.compile(r"\b(my|mine)\s+(\w+\s+){0,2}(is|was|are|of|=|at)\s+\d", re.I)
 DATE_IN_TEXT_RE = re.compile(r"\b(?:as of|on|by)\s+(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}|\d{4}-\d{2}-\d{2})", re.I)
 
 
@@ -102,7 +104,7 @@ def extract_entities(question: str) -> QuestionEntities:
     if m:
         e.reference_date = _parse_date(m.group(1))
     e.first_person = bool(FIRST_PERSON_RE.search(q))
-    e.personal_records = bool(PERSONAL_RECORD_RE.search(q))
+    e.personal_records = bool(PERSONAL_RECORD_RE.search(q)) and not STATED_VALUE_RE.search(q)
     return e
 
 

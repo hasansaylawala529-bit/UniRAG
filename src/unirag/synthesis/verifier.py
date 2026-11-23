@@ -218,7 +218,19 @@ def build_pool(*, rows: list[dict], passages_text: str, rule_text: str, profile:
     return pool
 
 
-def verify_answer(answer: str, pool: EvidencePool) -> VerificationReport:
+def database_totals(rows: list[dict]) -> list[Decimal]:
+    """Values of columns the database computed as totals (column name contains 'total')."""
+    out = []
+    for r in rows:
+        for c, v in r.items():
+            if "total" in c.lower() and isinstance(v, (int, float, Decimal)) and not isinstance(v, bool):
+                d = Decimal(str(v)).quantize(Q2)
+                if d not in out:
+                    out.append(d)
+    return out
+
+
+def verify_answer(answer: str, pool: EvidencePool, db_totals: list[Decimal] | None = None) -> VerificationReport:
     report = VerificationReport()
     for f in extract_figures(answer):
         if f.kind == "date":
@@ -239,4 +251,12 @@ def verify_answer(answer: str, pool: EvidencePool) -> VerificationReport:
             if any(sum(c) == target for c in itertools.combinations(verified_money, n)):
                 f.verified, f.basis = True, "derived: sum of verified figures in the answer"
                 break
+    # Consistency: if the database computed a total and the answer states a total, they must agree.
+    # (Provenance alone is not enough: in eval H3 a wrong "₹6,000" matched evidence by coincidence.)
+    if db_totals and re.search(r"\btotal\b", answer, re.I):
+        stated = {Decimal(f.value).quantize(Q2) for f in report.figures if f.kind in ("money", "number")}
+        if not stated & set(db_totals):
+            report.figures.append(Figure("total", "consistency", "", False,
+                                         "answer's total differs from the database total "
+                                         + ", ".join(_plain(t) for t in db_totals)))
     return report

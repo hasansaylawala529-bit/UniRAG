@@ -1,0 +1,23 @@
+{
+  "id": "DOC08",
+  "question": "What is the highest credit load allowed with an approved overload?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "The highest credit load allowed with an approved overload is 28 credits per term [Doc: Course Registration & Credit Policy 2026-27 §3].\n\nTo be eligible for this credit overload, the following condition must be met:\n* **CGPA Requirement:** A student must have a CGPA of 8.5 or higher [Doc: Course Registration & Credit Policy 2026-27 §3].\n* **Approval:** Written approval from the Head of Department is required [Doc: Course Registration & Credit Policy 2026-27 §3].\n\nPlease note that this policy does not apply to first-year students, who are restricted to the fixed first-year curriculum of 16 credits [Doc: Course Registration & Credit Policy 2026-27 §3].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 16685,
+  "wall_s": 0.38
+}

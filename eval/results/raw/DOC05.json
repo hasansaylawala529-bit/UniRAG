@@ -1,0 +1,23 @@
+{
+  "id": "DOC05",
+  "question": "What is the formula to turn a 10-point CGPA into a 4-point GPA?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "To convert a 10-point CGPA into a 4-point GPA, you use the following linear conversion formula:\n\n*   **4-point GPA = CGPA × 0.4**\n\n[Doc: Student Handbook 2026-27 §4 GPA conversion for external and scholarship purposes]\n\nFor example, a CGPA of 9.5 corresponds to a 4-point GPA of 3.8 [Doc: Student Handbook 2026-27 §4 GPA conversion for external and scholarship purposes]. Please note that all internal university eligibility decisions, such as those for grants, concessions, hostel, and credit overload, are based on the 10-point CGPA scale [Doc: Student Handbook 2026-27 §4 GPA conversion for external and scholarship purposes].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 13827,
+  "wall_s": 0.22
+}

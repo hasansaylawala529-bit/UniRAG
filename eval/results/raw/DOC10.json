@@ -1,0 +1,23 @@
+{
+  "id": "DOC10",
+  "question": "Within how many working days are grant applications screened after the deadline?",
+  "student": null,
+  "expected_route": "docs",
+  "route": "docs",
+  "stage": "llm",
+  "answer": "Grant applications are screened within 10 working days of the deadline [Doc: Research Grant Policy 2026-27 §4].\n\nThis screening process is conducted by the Office of Research & Innovation to determine the eligibility of the applications [Doc: Research Grant Policy 2026-27 §4].",
+  "facts_found": 1,
+  "facts_total": 1,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": null,
+  "sql_ok": null,
+  "sql_attempts": null,
+  "sql": null,
+  "gen_requests": 2,
+  "api_calls": 2,
+  "latency_ms": 19558,
+  "wall_s": 0.5
+}

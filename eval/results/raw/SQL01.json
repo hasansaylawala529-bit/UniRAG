@@ -5,7 +5,7 @@
   "expected_route": "sql",
   "route": "sql",
   "stage": "semantic",
-  "answer": "The total number of students currently enrolled in the Information Technology department is 64 [SQL].\n\n| Category | Total Students |\n| :--- | :--- |\n| Information Technology | 64 [SQL] |",
+  "answer": "The total number of students in the Information Technology department is 64 [SQL].\n\nThis figure is based on the count of student records associated with the 'IT' department code [SQL].",
   "facts_found": 1,
   "facts_total": 1,
   "missing": [],
@@ -19,5 +19,5 @@
   "gen_requests": 2,
   "api_calls": 2,
   "latency_ms": 19554,
-  "wall_s": 19.55
+  "wall_s": 3.39
 }

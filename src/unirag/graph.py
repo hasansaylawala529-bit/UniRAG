@@ -34,7 +34,8 @@ from .retrieval.sql_guard import PERSONAL_TABLES
 from .retrieval.vector_search import DocFilters, DocHit, grant_chunks, search_docs
 from .router import RouteDecision, semantic_route
 from .synthesis.synthesize import passages_for_prompt, synthesize
-from .synthesis.verifier import VerificationReport, build_pool, verify_answer
+from .synthesis.formatting import inr
+from .synthesis.verifier import VerificationReport, build_pool, database_totals, verify_answer
 
 GRANT_WORDS = re.compile(r"\b(grant|grants|fellowship|scholarship|funding|research|stipend|assistantship)\b", re.I)
 LOGIN_MESSAGE = ("This question is about your own records (fees, attendance, enrolment). Please choose your "
@@ -227,6 +228,14 @@ def node_synthesize(state: State) -> tuple[dict, dict]:
         sql_note = "(The database query failed; answer from the policy passages and say live values are unavailable.)"
     if r is not None and r.ok and r.unanswerable:
         sql_note = "(The database has no data for this question.)"
+    elif r is not None and r.ok:
+        # tell the answer step what the rows ARE (eval SQL06: rows without the filter column were misread
+        # as "no information"), and make database-computed totals authoritative (eval H3)
+        sql_note = f"These rows are the result of: {r.explanation}\nQuery: {r.sql}"
+        totals = database_totals(r.rows)
+        if totals:
+            sql_note += ("\nDatabase-computed total(s): " + ", ".join(inr(t) for t in totals)
+                         + ". If you state a total, use exactly this figure.")
     answer, pid, cites = synthesize(
         state["question"], profile_summary=state["profile"].summary(),
         columns=r.columns if (r and r.ok and not r.unanswerable) else [],
@@ -246,7 +255,8 @@ def node_verify(state: State) -> tuple[dict, dict]:
                       passages_text=passages_for_prompt(state.get("relevant_hits", [])),
                       rule_text=state.get("constraints", ""), profile=state["profile"].known(),
                       question=state["question"], as_of=get_settings().as_of_date, extra_dates=extra)
-    rep = verify_answer(state.get("answer", ""), pool)
+    rep = verify_answer(state.get("answer", ""), pool,
+                        db_totals=database_totals(r.rows) if (r and r.ok) else None)
     return ({"verification": rep},
             {"ok": rep.ok, "summary": rep.summary(),
              "unverified": [f.text for f in rep.unverified]})

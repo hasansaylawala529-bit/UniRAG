@@ -1,0 +1,23 @@
+{
+  "id": "HYB11",
+  "question": "Which of my courses are below the attendance requirement, and can the shortfall be condoned?",
+  "student": "S2024CS006",
+  "expected_route": "hybrid",
+  "route": "hybrid",
+  "stage": "llm",
+  "answer": "You have one course with attendance below the 75% requirement, which is eligible for condonation.\n\n### Courses below attendance requirement\n| Course Code | Title | Attendance |\n| :--- | :--- | :--- |\n| CS301 | Database Management Systems | 66.9% [SQL] |\n\n### Condonation Eligibility\nYour attendance in **CS301** (66.9%) falls within the range of at least 65% but below 75% [Doc: Examination & Attendance Rules 2026-27 §3]. Consequently, the shortfall may be condoned subject to the following conditions:\n\n*   **Application:** You must submit a condonation application with supporting documents (e.g., a medical certificate) to the Head of Department [Doc: Examination & Attendance Rules 2026-27 §3].\n*   **Fee:** A condonation fee of ₹500 per course is required [Doc: Examination & Attendance Rules 2026-27 §3].\n*   **Deadline:** The request must be made before the last teaching day of the term [Doc: Examination & Attendance Rules 2026-27 §3].\n*   **Limit:** A student may receive condonation in at most two courses per term [Doc: Examination & Attendance Rules 2026-27 §3].\n\nPlease note that if a condonation request is rejected, or if attendance is below 65%, you will be detained in the course and unable to take the end-semester examination [Doc: Examination & Attendance Rules 2026-27 §4].",
+  "facts_found": 3,
+  "facts_total": 3,
+  "missing": [],
+  "verdict_ok": true,
+  "verified_ok": true,
+  "flagged": [],
+  "sql_mode": "text_to_sql",
+  "sql_ok": true,
+  "sql_attempts": 1,
+  "sql": "SELECT c.course_code, c.title, e.attendance_pct FROM (SELECT * FROM enrollments WHERE student_id = 'S2024CS006') AS e JOIN courses AS c ON e.course_id = c.course_id WHERE e.student_id = 'S2024CS006' AND e.attendance_pct < 75 LIMIT 200",
+  "gen_requests": 3,
+  "api_calls": 3,
+  "latency_ms": 11201,
+  "wall_s": 3.45
+}

@@ -5,7 +5,7 @@
   "expected_route": "sql",
   "route": "sql",
   "stage": "llm",
-  "answer": "There are currently 21 fee ledger entries that are overdue across the university [SQL].\n\nA ledger entry is classified as **overdue** when any balance remains after the specified due date [Doc: Fee Payment & Refund Policy 2026-27 §3].",
+  "answer": "There are currently 21 fee ledger entries that are overdue across the university [SQL].\n\nA ledger entry is classified as **overdue** when any balance remains unpaid after the specified due date [Doc: Fee Payment & Refund Policy 2026-27 §3 Due dates and payment].",
   "facts_found": 1,
   "facts_total": 1,
   "missing": [],
@@ -19,5 +19,5 @@
   "gen_requests": 3,
   "api_calls": 3,
   "latency_ms": 9439,
-  "wall_s": 9.44
+  "wall_s": 1.98
 }

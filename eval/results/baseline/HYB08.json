@@ -1,0 +1,13 @@
+{
+  "id": "HYB08",
+  "answer": "Based on your 3.1 GPA on a 4-point scale, your CGPA on the 10-point scale is 7.75 (calculated as 3.1 ÷ 0.4) [Doc: Research Grant Policy 2026-27 §2].\n\nAs a second-year Information Technology student with a 7.75 CGPA, you are eligible for the following grant:\n\n*   **GR-OS-11 — Open Source Contribution Grant**: This grant is open to second-year IT students with a minimum CGPA of 7.0 [Doc: Research Grant Policy 2026-27 §3].\n\nYou are not eligible for the other grants listed in the policy for the following reasons:\n*   **GR-CY-03, GR-SUS-08, and GR-IOT-07**: These require a minimum CGPA of 8.0.\n*   **GR-HC-10 and GR-AI-01**: These require a minimum CGPA of 8.5 and are restricted to students in Year 3 and Year 4.\n*   **GR-ML-02**: This requires a minimum CGPA of 9.0, is restricted to Year 3 students, and is limited to the Computer Science & Engineering department.\n\nPlease note that eligibility is also subject to the grant's status in the Grants Register being \"open\" and meeting any applicable application deadlines [Doc: Research Grant Policy 2026-27 §2].",
+  "facts_found": 1,
+  "facts_total": 5,
+  "missing": [
+    "GR-DS-05",
+    "₹50,000",
+    "31 Dec 2026",
+    "₹25,000"
+  ],
+  "verdict_ok": true
+}
