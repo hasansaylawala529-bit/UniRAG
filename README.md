@@ -60,10 +60,17 @@ Measures routing accuracy (confusion matrix), key-fact accuracy per route, a vec
 hybrid questions, verifier pass rate, SQL success (compiled vs LLM-generated, first attempt vs self-repair)
 and generation requests / latency per route.
 
+## Security evaluation
+```bash
+python eval/run_adversarial.py             # 24 adversarial / privacy cases -> eval/results/adversarial_summary.md
+```
+Access policy (anonymous / student / staff, read-only, no e-mails): [`docs/security_policy.md`](docs/security_policy.md).
+
 ## Ask questions (full pipeline)
 ```bash
 python -m unirag.cli ask "I am a third-year CS student with a 3.8 GPA; what research grants am I eligible for, and what is the deadline to apply?" --trace
 python -m unirag.cli ask "Can I renew my hostel room next year?" --student S2025CS003 --trace
+python -m unirag.cli ask "Can student S2026CS003 get the hall ticket?" --staff   # named student: staff access
 python scripts/run_hybrid_demo.py          # six hybrid questions vs expected answers -> eval/results/hybrid_demo.md
 ```
 

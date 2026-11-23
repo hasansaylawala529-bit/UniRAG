@@ -29,6 +29,7 @@ ROUTE_STYLE = {   # route -> (label, colour)
     "docs": ("POLICY DOCUMENTS", "#059669"),
     "hybrid": ("HYBRID · DATABASE + POLICY", "#7c3aed"),
     "out_of_scope": ("OUT OF SCOPE", "#6b7280"),
+    "refused": ("REFUSED BY POLICY", "#b45309"),
 }
 STEP_NAMES = {
     "profile": "Read who is asking",
@@ -81,13 +82,13 @@ def friendly_error(e: Exception) -> str:
     return f"Something went wrong ({name}). The details are below."
 
 
-def run_question(question: str, student: str | None) -> None:
+def run_question(question: str, student: str | None, role: str | None) -> None:
     from unirag.graph import ask
 
-    entry = {"question": question, "student": student, "result": None, "error": None}
+    entry = {"question": question, "student": student, "role": role or "student", "result": None, "error": None}
     try:
         with st.spinner("Routing → retrieving → planning → answering → verifying…"):
-            entry["result"] = ask(question, student_id=student).to_dict()
+            entry["result"] = ask(question, student_id=student, role=role).to_dict()
     except Exception as e:  # noqa: BLE001 - shown to the user, never a raw stack trace
         entry["error"] = {"message": friendly_error(e), "detail": f"{type(e).__name__}: {e}"}
     st.session_state.history.append(entry)
@@ -133,10 +134,14 @@ with st.sidebar:
         db_ok = True
     except Exception:  # noqa: BLE001
         labels, db_ok = {}, False
-    options = ["(not logged in)"] + list(labels)
-    choice = st.selectbox("Logged in as", options, format_func=lambda o: labels.get(o, o),
-                          help="Questions about 'my' fees or attendance only show this student's rows.")
-    student = None if choice == "(not logged in)" else choice
+    STAFF, ANON = "staff", "(not logged in)"
+    role_labels = {STAFF: "Staff · academic advisor", ANON: "Not logged in (public)", **labels}
+    options = [STAFF, ANON] + list(labels)
+    choice = st.selectbox("Logged in as", options, format_func=lambda o: role_labels.get(o, o),
+                          help="Staff: any named student's records. Student: only their own records. "
+                               "Not logged in: policies and overall figures only.")
+    student = choice if choice in labels else None
+    role = "staff" if choice == STAFF else ("anonymous" if choice == ANON else None)
 
     if student:
         with st.expander("🛠️ Demo tools (admin)", expanded=False):
@@ -194,7 +199,7 @@ with chat_col:
     prompt = st.chat_input("e.g. I am a third-year CS student with a 3.8 GPA; which grants can I apply for?")
     pending = st.session_state.pop("pending", None) or prompt
     if pending:
-        run_question(pending, student)
+        run_question(pending, student, role)
 
     if not st.session_state.history:
         st.info("Pick an example on the left or type a question. Each answer shows its route, the SQL, "
@@ -202,7 +207,8 @@ with chat_col:
     # newest first, so a new answer appears right under the input box during the demo
     for idx, entry in reversed(list(enumerate(st.session_state.history))):
         with st.chat_message("user"):
-            who = f" _(logged in as {entry['student']})_" if entry["student"] else ""
+            who = (f" _(logged in as {entry['student']})_" if entry["student"]
+                   else " _(staff)_" if entry.get("role") == "staff" else " _(not logged in)_")
             st.markdown(entry["question"] + who)
         with st.chat_message("assistant"):
             if entry["error"]:
@@ -232,7 +238,7 @@ with trace_col:
         if r["router_stage"] == "semantic":
             decided = f"decided by the **semantic router** (embeddings, no LLM, vote {conf:.0%})"
         elif r["router_stage"] == "rule":
-            decided = "decided by a **privacy rule** (personal question, nobody logged in)"
+            decided = f"stopped by a **{r.get('refused_by') or 'policy rule'}**, before any model call"
         else:
             decided = (f"semantic router unsure ({conf:.0%}) → decided by the **LLM planner**"
                        if conf is not None else "decided by the **LLM planner**")
@@ -262,6 +268,8 @@ with trace_col:
             if "understand" in trace and trace["understand"].get("sql_task"):
                 st.markdown("**Planner's data request**")
                 st.caption(trace["understand"]["sql_task"])
+            if r.get("refused_by"):
+                st.warning(f"Refused by: {r['refused_by']} · role: {r.get('role')}")
             for n in r["notes"]:
                 st.warning(n)
 

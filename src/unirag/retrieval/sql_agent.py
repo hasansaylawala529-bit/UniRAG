@@ -12,7 +12,7 @@ from ..config import get_settings
 from ..db import connect, jsonable
 from ..llm import get_llm
 from ..prompts import render
-from .sql_guard import GuardError, guard_sql
+from .sql_guard import GuardError, PrivacyError, guard_sql
 
 HUB_TABLES = ("students", "departments", "courses", "grants")
 
@@ -46,6 +46,7 @@ class SQLResult:
     latency_ms: int
     error: str | None = None
     models_used: list[str] = field(default_factory=list)
+    privacy_block: str | None = None          # set when the access policy refused the query
 
     @property
     def unanswerable(self) -> bool:
@@ -96,7 +97,7 @@ def execute_readonly(sql: str) -> tuple[list[str], list[dict[str, Any]]]:
 
 
 def answer_sql(question: str, *, student_id: str | None = None, extra_context: str = "",
-               max_retries: int = 2) -> SQLResult:
+               max_retries: int = 2, role: str | None = None) -> SQLResult:
     s = get_settings()
     llm = get_llm()
     t0 = time.perf_counter()
@@ -119,12 +120,18 @@ def answer_sql(question: str, *, student_id: str | None = None, extra_context: s
         att = SQLAttempt(sql=draft.sql)
         attempts.append(att)
         try:
-            g = guard_sql(draft.sql, student_id=student_id, max_limit=s.sql_row_limit)
+            g = guard_sql(draft.sql, student_id=student_id, max_limit=s.sql_row_limit, role=role)
             att.guarded_sql, att.guard_notes = g.sql, g.notes
             cols, rows = execute_readonly(g.sql)
             return SQLResult(question, True, g.sql, cols, rows, draft.explanation, g.tables,
                              [t for t, _ in cards], entities, attempts, prompt_ids,
                              int((time.perf_counter() - t0) * 1000), models_used=models)
+        except PrivacyError as e:
+            # the access policy is not a bug to repair: stop here, never ask the model to work around it
+            att.error = f"PrivacyError: {e}"
+            return SQLResult(question, False, None, [], [], draft.explanation, [], [t for t, _ in cards], entities,
+                             attempts, prompt_ids, int((time.perf_counter() - t0) * 1000), error=att.error,
+                             models_used=models, privacy_block=str(e))
         except (GuardError, psycopg.Error) as e:
             att.error = f"{type(e).__name__}: {str(e).strip().splitlines()[0]}"
             if attempt_no == max_retries:

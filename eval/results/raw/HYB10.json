@@ -5,7 +5,7 @@
   "expected_route": "hybrid",
   "route": "hybrid",
   "stage": "llm",
-  "answer": "If you withdraw from the university today, you are not eligible for a tuition refund.\n\nAccording to the Fee Payment & Refund Policy 2026-27 §6, no refund is provided if a withdrawal request is received more than 30 days after classes begin. As 74 days have elapsed since classes began [SQL], you fall into this category.\n\n**Summary of your status:**\n*   **Total tuition paid:** ₹1,45,000 [SQL]\n*   **Days since classes began:** 74 days [SQL]\n*   **Refund eligibility:** No refund [Doc: Fee Payment & Refund Policy 2026-27 §6]\n\nPlease note that examination and laboratory fees are non-refundable once the term has started [Doc: Fee Payment & Refund Policy 2026-27 §6].",
+  "answer": "If you withdraw from the university today, you are not eligible for a tuition refund [Doc: Fee Payment & Refund Policy 2026-27 §6]. \n\nSince your withdrawal request is being made 74 days after classes began [SQL], which falls under the category of \"More than 30 days after classes begin\", the refund policy states that there is no refund [Doc: Fee Payment & Refund Policy 2026-27 §6]. You have paid a total tuition of ₹1,45,000 [SQL].\n\nHere is the policy breakdown for tuition refunds based on the timing of the withdrawal request:\n\n| Withdrawal request received | Tuition refund |\n|---|---|\n| Before classes begin | 90% of tuition paid, less a processing fee of ₹1,000 [Doc: Fee Payment & Refund Policy 2026-27 §6] |\n| Within 14 days after classes begin | 75% of tuition paid [Doc: Fee Payment & Refund Policy 2026-27 §6] |\n| 15–30 days after classes begin | 50% of tuition paid [Doc: Fee Payment & Refund Policy 2026-27 §6] |\n| More than 30 days after classes begin | No refund [Doc: Fee Payment & Refund Policy 2026-27 §6] |",
   "facts_found": 0,
   "facts_total": 0,
   "missing": [],
@@ -15,9 +15,9 @@
   "sql_mode": "text_to_sql",
   "sql_ok": true,
   "sql_attempts": 1,
-  "sql": "SELECT SUM(amount_paid) AS total_tuition_paid, (CAST('2026-10-27' AS DATE) - MIN(due_date)) AS days_since_classes_began FROM (SELECT * FROM fee_ledger WHERE student_id = 'S2025CS001') AS fee_ledger WHERE student_id = 'S2025CS001' AND component LIKE 'tuition%' LIMIT 200",
+  "sql": "SELECT SUM(amount_paid) AS total_tuition_paid, (CAST('2026-10-27' AS DATE) - MIN(due_date)) AS days_since_classes_began FROM fee_ledger WHERE student_id = 'S2025CS001' AND component LIKE 'tuition%' LIMIT 200",
   "gen_requests": 3,
   "api_calls": 3,
   "latency_ms": 38812,
-  "wall_s": 2.6
+  "wall_s": 17.55
 }

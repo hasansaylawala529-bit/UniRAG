@@ -1,6 +1,6 @@
 import pytest
 
-from unirag.retrieval.sql_guard import GuardError, guard_sql
+from unirag.retrieval.sql_guard import GuardError, PrivacyError, guard_sql
 
 # ---------------------------------------------------------------- allowed
 def test_simple_select_gets_limit():
@@ -31,8 +31,8 @@ def test_trailing_semicolon_ok():
 
 
 def test_large_limit_is_reduced_small_limit_kept():
-    assert "LIMIT 200" in guard_sql("SELECT * FROM students LIMIT 100000").sql
-    assert "LIMIT 5" in guard_sql("SELECT * FROM students LIMIT 5").sql
+    assert "LIMIT 200" in guard_sql("SELECT * FROM grants LIMIT 100000").sql
+    assert "LIMIT 5" in guard_sql("SELECT * FROM grants LIMIT 5").sql
 
 
 # ---------------------------------------------------------------- blocked statements
@@ -117,9 +117,13 @@ def test_personal_tables_scoped_to_student():
     assert any("Scoped fee_ledger" in n for n in r.notes)
 
 
-def test_scoping_holds_even_if_model_asks_for_other_student():
-    r = guard_sql("SELECT * FROM fee_ledger f WHERE f.student_id = 'S2023IT001'", student_id="S2024CS007")
-    # the outer filter asks for another student, but the table itself is already restricted
+def test_student_asking_for_another_student_is_refused():
+    with pytest.raises(PrivacyError):
+        guard_sql("SELECT * FROM fee_ledger f WHERE f.student_id = 'S2023IT001'", student_id="S2024CS007")
+
+
+def test_scoping_holds_whatever_filter_the_model_wrote():
+    r = guard_sql("SELECT * FROM fee_ledger f WHERE f.amount_due > 0", student_id="S2024CS007")
     assert "(SELECT * FROM fee_ledger WHERE student_id = 'S2024CS007') AS f" in r.sql
 
 
@@ -137,3 +141,47 @@ def test_non_personal_tables_not_scoped():
 def test_invalid_student_id_rejected():
     with pytest.raises(GuardError):
         guard_sql("SELECT * FROM students", student_id="x' OR '1'='1")
+
+
+
+# ---------------------------------------------------------------- access policy (roles)
+@pytest.mark.parametrize("sql", [
+    "SELECT * FROM students",
+    "SELECT full_name, cgpa FROM students ORDER BY cgpa DESC",
+    "SELECT s.full_name AS who FROM students s JOIN departments d ON s.dept_id = d.dept_id",
+    "SELECT student_id, amount_due - amount_paid FROM fee_ledger WHERE status = 'overdue'",
+    "SELECT grant_code FROM grants UNION SELECT full_name FROM students",
+])
+def test_anonymous_cannot_read_individual_records(sql):
+    with pytest.raises(PrivacyError):
+        guard_sql(sql, role="anonymous")
+
+
+@pytest.mark.parametrize("sql", [
+    "SELECT count(*) FROM students",
+    "SELECT d.code, round(avg(s.cgpa), 2) FROM students s JOIN departments d ON s.dept_id = d.dept_id GROUP BY d.code",
+    "SELECT status, count(*), sum(amount_due - amount_paid) FROM fee_ledger GROUP BY status",
+])
+def test_anonymous_can_read_aggregates(sql):
+    assert "Anonymous access" in "; ".join(guard_sql(sql, role="anonymous").notes)
+
+
+def test_anonymous_cannot_target_one_student_even_with_aggregates():
+    with pytest.raises(PrivacyError):
+        guard_sql("SELECT sum(amount_due) FROM fee_ledger WHERE student_id = 'S2026CS012'", role="anonymous")
+
+
+@pytest.mark.parametrize("role,student", [("anonymous", None), ("student", "S2024CS007"), ("staff", None)])
+def test_emails_never_returned(role, student):
+    with pytest.raises(PrivacyError, match="Email"):
+        guard_sql("SELECT full_name, email FROM students", role=role, student_id=student)
+
+
+def test_student_aggregates_are_not_scoped_to_self():
+    r = guard_sql("SELECT count(*) FROM students", student_id="S2024CS007")
+    assert "S2024CS007" not in r.sql
+
+
+def test_staff_can_read_named_student():
+    r = guard_sql("SELECT component, amount_due FROM fee_ledger WHERE student_id = 'S2026CS012'", role="staff")
+    assert "Staff access" in r.notes[0]

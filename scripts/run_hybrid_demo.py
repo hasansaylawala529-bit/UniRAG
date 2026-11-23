@@ -29,7 +29,7 @@ def main(selected: list[str]) -> None:
     for it in items:
         print(f"\n=== {it['id']}: {it['question']}")
         t0 = time.perf_counter()
-        r = ask(it["question"])
+        r = ask(it["question"], role="staff")        # H2-H6 look up named students: an advisor's view
         vals = answer_values(r.answer)
         facts = {f: fact_present(f, r.answer, vals) for f in it["key_facts"]}
         hit = sum(facts.values())

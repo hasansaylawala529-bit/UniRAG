@@ -69,14 +69,16 @@ def cmd_docs(args: argparse.Namespace) -> int:
 def cmd_ask(args: argparse.Namespace) -> int:
     from .graph import ask
 
-    r = ask(args.question, student_id=args.student)
+    r = ask(args.question, student_id=args.student, role="staff" if args.staff else None)
     if args.json:
         print(json.dumps(r.to_dict(), indent=2, ensure_ascii=False, default=str))
         return 0
     _hr("Answer")
     print(r.answer)
     _hr("How it was answered")
-    print(f"route: {r.route} (decided by {r.router_stage} router) · generation requests: {r.gen_requests} "
+    if r.refused_by:
+        print(f"refused by: {r.refused_by}")
+    print(f"role: {r.role} · route: {r.route} (decided by {r.router_stage} router) · generation requests: {r.gen_requests} "
           f"(API calls {r.llm_calls}) · {r.latency_ms} ms")
     print(f"verification: {r.verification['summary']}")
     if r.citations:
@@ -131,6 +133,7 @@ def main(argv: list[str] | None = None) -> int:
     pa = sub.add_parser("ask", help="Full pipeline: route, retrieve, plan, answer, verify")
     pa.add_argument("question")
     pa.add_argument("--student", help="Logged-in student_id (enables 'my ...' questions)")
+    pa.add_argument("--staff", action="store_true", help="Ask with staff access (named-student records)")
     pa.add_argument("--trace", action="store_true", help="Show the per-node trace")
     pa.add_argument("--json", action="store_true", help="Print the full result as JSON")
     pa.set_defaults(func=cmd_ask)

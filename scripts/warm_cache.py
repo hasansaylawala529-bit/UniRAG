@@ -19,10 +19,11 @@ from unirag.graph import ask  # noqa: E402
 if __name__ == "__main__":
     runs = [(q, None) for q in all_examples()] + [("What are my overdue fees?", "S2026CS012"),
                                                    ("Can I renew my hostel room next year?", DEMO_STUDENTS[2])]
+    # examples run with staff access (the UI's default role); personal ones as the logged-in student
     for q, sid in runs:
         t0 = time.perf_counter()
         try:
-            r = ask(q, student_id=sid)
+            r = ask(q, student_id=sid, role=None if sid else "staff")
             print(f"{time.perf_counter() - t0:5.1f}s  {r.route:<12} req={r.gen_requests}  api={r.llm_calls}  "
                   f"{'ok ' if r.verification['ok'] else 'FLAG'}  {q[:70]}" + (f"  [{sid}]" if sid else ""))
         except Exception as e:  # noqa: BLE001

@@ -24,6 +24,17 @@ PERSONAL_RECORD_RE = re.compile(
     r"\b(my|mine)\s+(\w+\s+)?(fee|fees|dues|balance|ledger|payment|payments|cgpa|gpa|grade|grades|"
     r"attendance|course|courses|enrol\w*|timetable|schedule|credits|hostel|application|applications|result|"
     r"results|record|records|profile)\b", re.I)
+# requests to change data: refused before any model call (the assistant is read-only)
+WRITE_INTENT_RE = re.compile(
+    r"\b(delete|truncate|insert)\b|\bdrop\s+(the|table|all|every|my|his|her|their)\b"
+    r"|\bupdate\s+(the|my|his|her|their|all|\w+'s)\b"
+    r"|\bmark\b.{0,40}\bas\s+(paid|cleared|present|passed)\b"
+    r"|\bset\s+(my|the|his|her|their|\w+'s)\s+[\w\s]{0,20}\bto\b"
+    r"|\b(change|modify|edit|alter|increase|raise|waive|erase)\s+(my|the|his|her|their|all|\w+'s)\s+"
+    r"[\w\s]{0,20}(cgpa|gpa|grades?|fees?|dues|fine|attendance|records?|marks?|ledger|balance|status)\b", re.I)
+# "how do I / can I ..." asks about a procedure the student performs, not a command to the assistant
+SELF_PROCEDURE_RE = re.compile(r"^\s*(how\s+(do|can|should)\s+i|can\s+i|may\s+i|what\s+happens|is\s+it\s+possible"
+                               r"\s+(for\s+me\s+)?to|when\s+can\s+i)\b", re.I)
 # "my attendance is 70 percent" states the value: a hypothetical policy question, not a record lookup
 STATED_VALUE_RE = re.compile(r"\b(my|mine)\s+(\w+\s+){0,2}(is|was|are|of|=|at)\s+\d", re.I)
 DATE_IN_TEXT_RE = re.compile(r"\b(?:as of|on|by)\s+(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}|\d{4}-\d{2}-\d{2})", re.I)
@@ -65,6 +76,7 @@ class QuestionEntities:
     reference_date: date | None = None
     first_person: bool = False
     personal_records: bool = False
+    write_intent: bool = False
 
 
 def extract_entities(question: str) -> QuestionEntities:
@@ -105,6 +117,7 @@ def extract_entities(question: str) -> QuestionEntities:
         e.reference_date = _parse_date(m.group(1))
     e.first_person = bool(FIRST_PERSON_RE.search(q))
     e.personal_records = bool(PERSONAL_RECORD_RE.search(q)) and not STATED_VALUE_RE.search(q)
+    e.write_intent = bool(WRITE_INTENT_RE.search(q)) and not SELF_PROCEDURE_RE.search(q)
     return e
 
 

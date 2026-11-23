@@ -19,5 +19,5 @@
   "gen_requests": 1,
   "api_calls": 1,
   "latency_ms": 16825,
-  "wall_s": 0.19
+  "wall_s": 0.11
 }

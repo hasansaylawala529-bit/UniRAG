@@ -38,6 +38,14 @@ from .synthesis.formatting import inr
 from .synthesis.verifier import VerificationReport, build_pool, database_totals, verify_answer
 
 GRANT_WORDS = re.compile(r"\b(grant|grants|fellowship|scholarship|funding|research|stipend|assistantship)\b", re.I)
+WRITE_MESSAGE = ("I can read university records but I can't change them: the assistant has read-only access. "
+                 "Fee payments, grade or attendance corrections are handled by the Accounts Office or the "
+                 "Examination Cell.")
+OWN_RECORDS_MESSAGE = ("You can only view your own records. Questions about another student's fees, attendance or "
+                       "results need staff access.")
+STAFF_ONLY_MESSAGE = ("Records of an individual student need a logged-in student (their own records) or staff "
+                      "access. Without logging in I can share policies and overall figures such as counts and "
+                      "averages.")
 LOGIN_MESSAGE = ("This question is about your own records (fees, attendance, enrolment). Please choose your "
                  "student ID under \"Logged in as\" so I can show only your data.")
 DECLINE_MESSAGE = ("I can only help with DVUT questions about courses and timetables, fees and refunds, research "
@@ -60,7 +68,9 @@ class State(TypedDict, total=False):
     rule_eval: RuleEvaluation | None
     constraints: str
     fallback: bool
-    login_required: bool
+    role: str                         # anonymous | student | staff
+    refusal: str                      # set when a policy layer refuses; answer = this message, no LLM
+    refused_by: str
     sql: SQLResult | None
     answer: str
     citations: list[str]
@@ -93,14 +103,25 @@ def traced(name: str) -> Callable:
 # ------------------------------------------------------------------ nodes
 @traced("profile")
 def node_profile(state: State) -> tuple[dict, dict]:
+    role = "student" if state.get("student_id") else (state.get("role") or "anonymous")
     profile, ents = build_profile(state["question"], state.get("student_id"))
-    if ents.personal_records and not state.get("student_id") and not ents.student_id:
-        # "my fees / my CGPA ..." with nobody logged in: nothing can be answered safely -> no model call
-        return ({"profile": profile, "entities": ents, "login_required": True, "route": "sql",
-                 "router_stage": "rule", "notes": ["Personal question without a logged-in student."]},
-                {"summary": profile.summary(), "login_required": True})
-    return ({"profile": profile, "entities": ents, "notes": []},
-            {"summary": profile.summary(),
+    base = {"profile": profile, "entities": ents, "role": role, "notes": []}
+    # deterministic policy checks: refuse before any model call (0 generation requests)
+    refusal = None
+    if ents.write_intent:
+        refusal = (WRITE_MESSAGE, "write-intent rule")
+    elif role == "student" and ents.student_id and ents.student_id != state.get("student_id"):
+        refusal = (OWN_RECORDS_MESSAGE, "privacy rule (other student)")
+    elif role == "anonymous" and ents.student_id:
+        refusal = (STAFF_ONLY_MESSAGE, "privacy rule (named student)")
+    elif ents.personal_records and not state.get("student_id") and not ents.student_id:
+        refusal = (LOGIN_MESSAGE, "privacy rule (not logged in)")
+    if refusal:
+        return ({**base, "refusal": refusal[0], "refused_by": refusal[1], "route": "refused",
+                 "router_stage": "rule"},
+                {"summary": profile.summary(), "role": role, "refused_by": refusal[1]})
+    return (base,
+            {"summary": profile.summary(), "role": role,
              "entities": {k: v for k, v in asdict(ents).items() if v not in (None, [], False)}})
 
 
@@ -182,8 +203,8 @@ def node_query(state: State) -> tuple[dict, dict]:
     u = state.get("understanding")
     ents = state["entities"]
     question = (u.sql_task if u and u.sql_task.strip() else state["question"])
-    personal = (u.needs_personal_scope if u else ents.first_person)
-    scope = state.get("student_id") if personal else None
+    role = state.get("role", "anonymous")
+    scope = state.get("student_id") if role == "student" else None      # the guard decides own-rows vs aggregate
     ref = ents.reference_date or (_iso(u.entities.reference_date) if u else None)
     context = "\n".join(x for x in [
         state.get("constraints", ""),
@@ -196,26 +217,28 @@ def node_query(state: State) -> tuple[dict, dict]:
         # grant eligibility is fully determined by the rule engine: compile the query, no LLM
         r, mode = compiled_grant_query(eligible), "compiled_from_rules"
     else:
-        r, mode = answer_sql(question, student_id=scope, extra_context=context), "text_to_sql"
+        r, mode = answer_sql(question, student_id=scope, extra_context=context, role=role), "text_to_sql"
     executed_at = datetime.now().strftime("%H:%M:%S")      # SQL text may be cached; execution never is
     notes = [] if r.ok else [f"The database step failed ({r.error}); the answer uses policy documents only."]
-    # Privacy: "my ..." questions with nobody logged in and no student named must not return other
-    # students' rows from personal tables (the SQL could not be scoped to anyone).
-    if personal and not state.get("student_id") and not ents.student_id and set(r.tables_used) & PERSONAL_TABLES:
-        return ({"sql": None, "login_required": True, "notes": ["Personal question without a logged-in student: "
-                                                                  "rows withheld."]},
-                {"mode": mode, "withheld": True, "reason": "personal records need a logged-in student"})
+    if r.privacy_block:
+        msg = {"anonymous": STAFF_ONLY_MESSAGE, "student": OWN_RECORDS_MESSAGE}.get(role, r.privacy_block)
+        if "Email" in r.privacy_block:
+            msg = "Email addresses are not shared by the assistant. Please contact the Academic Office."
+        return ({"sql": None, "refusal": msg, "refused_by": "SQL guard (access policy)"},
+                {"mode": mode, "executed_at": executed_at, "blocked": r.privacy_block, "role": role})
     return ({"sql": r, "notes": notes},
             {"prompt": ",".join(r.prompt_ids), "sql_question": question, "sql": r.sql, "ok": r.ok,
              "rows": len(r.rows), "attempts": len(r.attempts), "scoped_to": scope,
              "guard": r.attempts[-1].guard_notes if r.attempts else [], "model": ",".join(r.models_used),
-             "mode": mode, "executed_at": executed_at})
+             "attempt_errors": [a.error for a in r.attempts if a.error],
+             "mode": mode, "executed_at": executed_at, "role": role})
 
 
 @traced("synthesize")
 def node_synthesize(state: State) -> tuple[dict, dict]:
-    if state.get("login_required"):
-        return ({"answer": LOGIN_MESSAGE, "citations": [], "relevant_hits": []}, {"login_required": True})
+    if state.get("refusal"):
+        return ({"answer": state["refusal"], "citations": [], "relevant_hits": []},
+                {"refused_by": state.get("refused_by")})
     r = state.get("sql")
     hits = state.get("relevant_hits") or ([] if state.get("route") == "sql" else state.get("hits", [])[:4])
     ev = state.get("rule_eval")
@@ -278,7 +301,7 @@ def _iso(s: str | None) -> date | None:
 
 # ------------------------------------------------------------------ edges
 def after_profile(state: State) -> str:
-    return "synthesize" if state.get("login_required") else "route"
+    return "synthesize" if state.get("refusal") else "route"
 
 
 def after_route(state: State) -> str:
@@ -338,6 +361,8 @@ class AskResult:
     profile: dict
     notes: list[str]
     trace: list[dict]
+    role: str
+    refused_by: str | None
     gen_requests: int
     llm_calls: int
     cache_hits: int
@@ -348,9 +373,10 @@ class AskResult:
         return asdict(self)
 
 
-def ask(question: str, student_id: str | None = None) -> AskResult:
+def ask(question: str, student_id: str | None = None, role: str | None = None) -> AskResult:
+    """role: 'anonymous' (default), 'staff', or implied 'student' when student_id is given."""
     t0 = time.perf_counter()
-    final: State = build_graph().invoke({"question": question, "student_id": student_id,
+    final: State = build_graph().invoke({"question": question, "student_id": student_id, "role": role,
                                          "notes": [], "trace": []})
     r = final.get("sql")
     ver = final.get("verification")
@@ -366,6 +392,7 @@ def ask(question: str, student_id: str | None = None) -> AskResult:
                   for h in final.get("relevant_hits", [])],
         rules=ev.to_dict() if ev else None, profile=final["profile"].known() if final.get("profile") else {},
         notes=final.get("notes", []), trace=trace,
+        role=final.get("role", "anonymous"), refused_by=final.get("refused_by"),
         gen_requests=sum(e.get("gen_requests", 0) for e in trace),
         llm_calls=sum(e.get("llm_calls", 0) for e in trace), cache_hits=sum(e.get("cache_hits", 0) for e in trace),
         latency_ms=int((time.perf_counter() - t0) * 1000))

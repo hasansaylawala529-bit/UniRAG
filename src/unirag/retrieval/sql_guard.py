@@ -7,8 +7,13 @@ Defence in depth: this guard is the first layer; the read-only role with a state
   3. rejects SELECT INTO, row locks (FOR UPDATE) and dangerous functions (pg_sleep, file access, ...);
   4. allows only the nine application tables (no system catalogs, no vector tables);
   5. enforces a row LIMIT;
-  6. optionally scopes personal tables to one student by replacing each reference with a filtered
-     subquery, so the scope holds whatever WHERE clause the model wrote.
+  6. enforces the access policy (docs/security_policy.md) on personal tables:
+       anonymous - aggregates only (counts, averages); no individual rows, no targeting one student;
+       student   - aggregates, or their OWN rows: every personal table is replaced by a subquery filtered
+                   to their student_id, so the scope holds whatever WHERE clause the model wrote;
+                   naming another student's id is refused;
+       staff     - individual records allowed (advising);
+       everyone  - email addresses are never returned or filtered on.
 """
 from __future__ import annotations
 
@@ -40,6 +45,17 @@ class GuardError(ValueError):
     """Raised when SQL is rejected. The message is safe to show the model for self-correction."""
 
 
+class PrivacyError(GuardError):
+    """Rejected by the access policy. Not sent back for self-repair: rewording cannot make it allowed."""
+
+
+ROLES = ("anonymous", "student", "staff")
+# columns that identify or describe one person; unaggregated, they reveal individual records
+IDENTIFYING_COLUMNS = {"student_id", "full_name", "email", "cgpa", "gpa_4", "amount_due", "amount_paid", "paid_on",
+                       "attendance_pct", "grade", "submitted_on", "admission_year", "is_hosteller"}
+NEVER_RETURNED = {"email"}
+
+
 @dataclass
 class GuardResult:
     sql: str
@@ -53,7 +69,53 @@ def _func_name(node: exp.Expression) -> str:
     return node.sql_name().lower() if hasattr(node, "sql_name") else node.key.lower()
 
 
-def guard_sql(sql: str, *, student_id: str | None = None, max_limit: int = 200) -> GuardResult:
+def _outer_selects(node: exp.Expression) -> list[exp.Select]:
+    """The SELECTs whose columns are returned to the user (both sides of a UNION)."""
+    if isinstance(node, exp.Select):
+        return [node]
+    if isinstance(node, (exp.Union, exp.Intersect, exp.Except)):
+        return _outer_selects(node.left) + _outer_selects(node.right)
+    return []
+
+
+def _inside_aggregate(col: exp.Column, stop: exp.Expression) -> bool:
+    node = col.parent
+    while node is not None and node is not stop.parent:
+        if isinstance(node, exp.AggFunc):
+            return True
+        node = node.parent
+    return False
+
+
+def _aggregate_only(tree: exp.Expression) -> bool:
+    """True if every returned column is an aggregate or a non-identifying attribute (department, year...)."""
+    for sel in _outer_selects(tree):
+        for proj in sel.expressions:
+            if isinstance(proj, exp.Star):
+                return False
+            for col in proj.find_all(exp.Column):
+                if isinstance(col.this, exp.Star):
+                    return False
+                if col.name.lower() in IDENTIFYING_COLUMNS and not _inside_aggregate(col, proj):
+                    return False
+    return True
+
+
+def _student_literals(tree: exp.Expression) -> set[str]:
+    """student_id values the query filters on, e.g. WHERE student_id = 'S2024CS007' or IN (...)."""
+    out = set()
+    for node in tree.find_all(exp.EQ, exp.In):
+        cols = [c for c in node.find_all(exp.Column) if c.name.lower() == "student_id"]
+        if cols:
+            out |= {lit.this.upper() for lit in node.find_all(exp.Literal) if lit.is_string}
+    return out
+
+
+def guard_sql(sql: str, *, student_id: str | None = None, max_limit: int = 200,
+              role: str | None = None) -> GuardResult:
+    role = role or ("student" if student_id else "anonymous")
+    if role not in ROLES:
+        raise GuardError(f"Unknown role {role!r}.")
     if not sql or not sql.strip():
         raise GuardError("Empty SQL.")
     try:
@@ -89,13 +151,35 @@ def guard_sql(sql: str, *, student_id: str | None = None, max_limit: int = 200) 
         raise GuardError("Query does not read from any application table.")
 
     notes: list[str] = []
-    if student_id is not None:
-        if not STUDENT_ID_RE.match(student_id):
-            raise GuardError("Invalid student_id for scoping.")
-        scoped = sorted({t for t in tables if t in PERSONAL_TABLES})
-        tree = _scope_to_student(tree, student_id, cte_names)
-        if scoped:
-            notes.append(f"Scoped {', '.join(scoped)} to student_id = {student_id}")
+    for col in tree.find_all(exp.Column):
+        if col.name.lower() in NEVER_RETURNED:
+            raise PrivacyError("Email addresses are never returned by the assistant.")
+    personal = sorted({t for t in tables if t in PERSONAL_TABLES})
+    if personal:
+        aggregate = _aggregate_only(tree)
+        targeted = _student_literals(tree)
+        if role == "anonymous":
+            if not aggregate:
+                raise PrivacyError("Individual student records need a logged-in student or staff access; "
+                                   "only aggregate figures (counts, averages) are available anonymously.")
+            if targeted:
+                raise PrivacyError("Figures about one named student need a logged-in student or staff access.")
+            notes.append("Anonymous access: aggregate-only query on " + ", ".join(personal))
+        elif role == "student":
+            if student_id is None or not STUDENT_ID_RE.match(student_id):
+                raise GuardError("Invalid student_id for scoping.")
+            others = {t for t in targeted if t != student_id}
+            if others:
+                raise PrivacyError("Students can only view their own records.")
+            if not aggregate:
+                tree = _scope_to_student(tree, student_id, cte_names)
+                notes.append(f"Scoped {', '.join(personal)} to student_id = {student_id}")
+            else:
+                notes.append("Aggregate-only query: no individual records returned")
+        else:
+            notes.append("Staff access: individual records allowed")
+    elif role == "student" and student_id is not None and not STUDENT_ID_RE.match(student_id):
+        raise GuardError("Invalid student_id for scoping.")
 
     limit = tree.args.get("limit")
     if limit is None:

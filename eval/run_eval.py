@@ -40,12 +40,22 @@ def load_items() -> list[dict]:
 
 
 # ------------------------------------------------------------------ running
+STUDENT_ID_RE = __import__("re").compile(r"\bS\d{4}(?:CS|IT|ENTC)\d{3}\b")
+
+
+def item_role(item: dict) -> str | None:
+    """Logged-in student -> student; a question naming a student -> staff (advisor); otherwise anonymous."""
+    if item.get("student"):
+        return None
+    return "staff" if STUDENT_ID_RE.search(item["question"]) else "anonymous"
+
+
 def run_item(item: dict) -> dict:
     from unirag.graph import ask
 
     t0 = time.perf_counter()
     try:
-        r = ask(item["question"], student_id=item.get("student"))
+        r = ask(item["question"], student_id=item.get("student"), role=item_role(item))
     except Exception as e:  # noqa: BLE001 - a failure is a result, not a crash
         return {"id": item["id"], "error": f"{type(e).__name__}: {e}", "expected_route": item["route"]}
     q = next((e for e in r.trace if e["node"] == "query_db"), None)
@@ -114,7 +124,7 @@ def summarise(items: list[dict], recs: dict, base: dict) -> tuple[str, dict]:
     # routing
     cm = {(a, b): 0 for a in ROUTES for b in ROUTES}
     for r in ok:
-        cm[(r["expected_route"], r["route"])] += 1
+        cm[(r["expected_route"], r["route"])] = cm.get((r["expected_route"], r["route"]), 0) + 1
     correct = sum(cm[(r, r)] for r in ROUTES)
     stage = Counter(r["stage"] for r in ok)
     L += ["## 1. Routing", "",
