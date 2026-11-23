@@ -9,21 +9,27 @@
 This log records the prompts I used to direct an AI assistant through each phase of building UniRAG: deciding the solution, generating data, writing code, debugging, evaluation, and preparing the presentation.
 - For each prompt the log shows its goal, the exact prompt, a summary of the result, and my decision or change afterwards.
 - Informal clarifying exchanges are not included. Every prompt listed here was used as written and produced the output described.
+- Where a step was driven by terminal output rather than a written prompt (live runs, test results), the entry says so and quotes the key lines.
+- IDs are chronological. Entries are grouped by phase, so a few appear out of numeric order (for example, P-025 sits with the Phase 7 reliability work, and P-026 with the Phase 1 design decisions it explains).
 - Prompts used inside the running product (router, SQL generation, answer synthesis) are documented separately, with version history.
 
 ## Entry format
 | Field | Meaning |
 |---|---|
-| ID | P-xxx, numbered in order |
-| Phase | Which development stage it belongs to |
-| Goal | What I needed from this step |
-| Prompt | The exact text sent |
+| ID | P-xxx, numbered in the order the prompts were sent |
+| Date/time | When the prompt was sent (IST) |
+| Goal or Context | What I needed from this step, or what prompted it |
+| Prompt | The exact text sent, or a description of the terminal output shared, with its key lines |
 | Output | Summary of what was produced (files, decisions) |
-| Review & decision | What I checked, accepted, rejected or changed next |
+| Review | What I checked, accepted, rejected or changed next; live results where they came later |
+
+Some entries add sections such as Diagnosis or Findings where the step needed them.
 
 ---
 
 ## Phase 1 – Solution design & architecture
+
+Before P-001 I explored the problem statement informally: what to build, which data to simulate, and which stack fits a 24-hour, free-tier, run-on-my-laptop constraint. That exchange is not reproduced here. Its outcome is the ten design decisions stated in P-001, which I then asked the assistant to review critically.
 
 ### P-001 · Solution design & architecture review
 - **Date/time:** 2026-11-23, 14:19 IST
@@ -68,6 +74,35 @@ Save the result as docs/architecture.md in the project folder. Do not write impl
   - a student selector for personal, row-scoped questions
 
   Agreed cut order if behind schedule: MCP → HyDE → regeneration step.
+
+### P-026 · Technology decision record
+- **Date/time:** 2026-11-24, 01:14 IST. Added during the final review, after implementation, to write down the reasoning behind the Phase 1 choices. It is listed here because it belongs to the design phase.
+- **Goal:** Be able to defend every major technology choice: the options, why the chosen one fits, what it costs, and when to revisit it.
+- **Prompt:**
+```text
+Phase 1 Addendum – Technology Decision Record
+
+Record the reasoning behind each major technology choice in UniRAG, so every decision can be defended. For each decision, give the options I could have chosen, why the chosen one fits this problem and its constraints (free tier, local Docker, 24-hour build, read-only access to university data), what it costs, and what would make me revisit it:
+
+1. One PostgreSQL database with pgvector, instead of a relational database plus a separate vector database (for example Chroma, Qdrant or Pinecone).
+2. Gemini Flash-Lite as the main model, with Groq as fallback, instead of a single provider or a local model.
+3. LangGraph for orchestration, instead of plain Python functions or a different agent framework.
+4. Retrieved schema cards for text-to-SQL, instead of passing the full schema, and what the ablation showed.
+5. A rule engine in code for eligibility, instead of letting the model apply the rules.
+6. Hybrid vector-plus-keyword search over the policy documents, instead of pure vector search.
+7. Streamlit for the interface, instead of a custom web front end.
+
+Save it as docs/design_decisions.md and keep each decision short enough to explain in under a minute.
+```
+- **Output:** `docs/design_decisions.md`. It opens with a one-line summary table, then gives each of the seven decisions as options, why it fits, cost and when to revisit. Evidence is cited where it exists:
+  - **pgvector:** one read-only role covers rows and vectors, and one SQL query filters vectors by grant code and department. The corpus is 61 chunks, 9 cards, 90 entities and 60 exemplars.
+  - **Groq:** limits of 8K tokens/min and 200K tokens/day explain why it is the fallback, not the primary.
+  - **Rule engine:** the ablation shows 93% → 62% key facts without it.
+- **Review:** two decisions are stated as **not proven** on this data, rather than claimed:
+  - **Schema cards:** the ablation showed no difference at 9 tables (93% vs 93%). They are kept as a design argument for larger schemas.
+  - **Hybrid search weights:** set by hand and not ablated.
+
+  All figures were checked against `eval/results/` and the ingest log.
 
 ## Phase 2 – Synthetic data & knowledge base
 
@@ -1003,18 +1038,18 @@ Build the submission presentation for the eliminative round: at most 10 slides c
 ## Product prompts (runtime, versioned)
 | ID | Component | Version | Change & reason |
 |---|---|---|---|
+| `understand` | Stage-2 routing + entities + passage relevance + rule extraction + SQL task | v1 | Initial: one combined call to meet the 3-call budget; fixed rule schema; "put all arithmetic in sql_task" |
+| `understand` | Planner call | v2 | H1/H5/H6 live failures: `sql_task` must be plain English (v1 produced SQL with invented columns), name required columns, request underlying records, and push all final figures (with per-category rule exceptions) into the database |
+| `understand` | Planner call | v3 | H3 live failure: day-count convention (reference date − due date) and caps via LEAST(...) |
 | `sql_generate` | Text-to-SQL generation | v1 | Initial: retrieved schema cards, entity hints, fixed reference date, 4-point→10-point conversion rule, explicit UNANSWERABLE escape |
+| `sql_generate` | Text-to-SQL | v2 | H2 live failure: never return bare surrogate ids, join to codes and titles; planner constraints moved into a "must be followed" section |
 | `sql_repair` | SQL self-correction | v1 | Initial: failed query + error message → corrected query |
 | `relevance_grade` | Chunk relevance grading (fast model) | v1 | Initial: one batched call; "same topic but doesn't change the answer" counts as not relevant |
 | `relevance_grade` | Chunk relevance grading | v2 | Live test marked §4 Detention irrelevant for a 70% attendance question; consequences that may apply under conditions not ruled out now count as relevant |
-| `understand` | Stage-2 routing + entities + passage relevance + rule extraction + SQL task | v1 | Initial: one combined call to meet the 3-call budget; fixed rule schema; "put all arithmetic in sql_task" |
 | `synthesize` | Final cited answer | v1 | Initial: [SQL]/[Doc] citations, copy figures exactly, no new arithmetic, say when data is missing |
-| `understand` | Planner call | v2 | H1/H5/H6 live failures: `sql_task` must be plain English (v1 produced SQL with invented columns), name required columns, request underlying records, and push all final figures (with per-category rule exceptions) into the database |
-| `sql_generate` | Text-to-SQL | v2 | H2 live failure: never return bare surrogate ids, join to codes and titles; planner constraints moved into a "must be followed" section |
-| `understand` | Planner call | v3 | H3 live failure: day-count convention (reference date − due date) and caps via LEAST(...) |
-| `baseline_vector_only` | Evaluation baseline (top-8 passages, no database) | v1 | Initial: same citation style; told to say when live values are missing |
-| `conversation_rewrite` | Follow-up → standalone question (fast model) | v1 | Initial (P-023): resolve references from the last 3 turns, keep stated details, never add a student ID or name, never answer |
-| `synthesize` | Final cited answer | v5 | UI review: a wrong total (₹1,13,500) slipped through; totals must be DB-computed or explicit sums stating what they include; not-yet-due items never "overdue" |
-| `synthesize` | Final cited answer | v4 | H1 live run: answers dropped grant codes; identifying codes must appear next to names |
-| `synthesize` | Final cited answer | v3 | H2/H3 live failures: read columns by name (a percentage is never money), apply caps, one final figure only |
 | `synthesize` | Final cited answer | v2 | H1/H2/H5/H6 live failures: respect closed/upcoming status, state rule exceptions, allow ONE simple step with the working shown, list underlying records |
+| `synthesize` | Final cited answer | v3 | H2/H3 live failures: read columns by name (a percentage is never money), apply caps, one final figure only |
+| `synthesize` | Final cited answer | v4 | H1 live run: answers dropped grant codes; identifying codes must appear next to names |
+| `synthesize` | Final cited answer | v5 | UI review: a wrong total (₹1,13,500) slipped through; totals must be DB-computed or explicit sums stating what they include; not-yet-due items never "overdue" |
+| `conversation_rewrite` | Follow-up → standalone question (fast model) | v1 | Initial (P-023): resolve references from the last 3 turns, keep stated details, never add a student ID or name, never answer |
+| `baseline_vector_only` | Evaluation baseline (top-8 passages, no database) | v1 | Initial: same citation style; told to say when live values are missing |

@@ -126,4 +126,5 @@ docker exec -it unirag-db psql -U unirag_admin -d unirag -c "SELECT grant_code, 
 | `eval/` | Test sets and runners: evaluation, security, ablation, conversations |
 | `tests/` | Unit tests |
 | `docs/architecture.md` | Architecture and design decisions |
+| `docs/design_decisions.md` | Technology decision record: options, reasons, costs, when to revisit |
 | `prompts.md` | Prompt engineering log |
