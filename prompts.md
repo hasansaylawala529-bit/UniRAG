@@ -1,8 +1,8 @@
 # UniRAG – Prompt Engineering Log
 
-**Project:** Unified Hybrid RAG for Structured + Unstructured University Data
-**Submission:** Dell Internship Drive – PICT (eliminative round)
-**Author:** Hasan Saylawala (hasansaylawala22@gmail.com)
+**Project:** Unified Hybrid RAG for Structured + Unstructured University Data  
+**Submission:** Dell Internship Drive – PICT (eliminative round)  
+**Author:** Hasan Saylawala (hasansaylawala22@gmail.com)  
 **AI assistant used:** Claude (Anthropic), linked to the local project repository
 
 ## About this log
@@ -1031,7 +1031,7 @@ Build the submission presentation for the eliminative round: at most 10 slides c
     - The presenter's name and e-mail are on the title slide. The staff row on slide 8 reads "individual student records, never e-mail", matching P-025.
     - The speaker notes for slides 1, 3, 4, 9 and 10 were rewritten to match.
     - The figure check now covers the ablation too: **37/37 figures confirmed** against the result files. Every slide was rendered and checked again, and the validator passes.
-    - The demo video link is added by the presenter in the marked box on slides 1 and 10.
+    - The demo video (Google Drive) is linked from slides 1 and 10 as "Watch the demo video".
 
 ---
 
